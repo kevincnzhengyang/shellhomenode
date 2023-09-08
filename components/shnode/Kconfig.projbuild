@@ -1,0 +1,232 @@
+menu "ShellHome Node config"
+menuconfig NODE_ENABLE_RESET
+    bool "Enable reset button"
+    default y
+    if NODE_ENABLE_RESET
+        config NODE_RESET_GPIO_NUM
+            int "GPIO number to reset network"
+            range 0 39
+            default 2
+    endif
+
+    if NODE_ENABLE_RESET
+        config RESET_PRESS_LONG_S
+            int "Reset button press time s (3~10)"
+            range 3 10
+            default 5
+    endif
+
+menu "Protocol Service"
+    config NODE_SERVICE_PORT
+        int "UPD port for node service"
+        default 39199
+        help
+            UDP port for node service
+
+    config NODE_TERM_NUM
+        int "Terminal number for a node"
+        default 3
+        help
+            How many terminal one node would accept
+
+    config NODE_USING_IPV6
+        bool "Using IP V6 or not"
+        default n
+        help
+            Using IP V6 or not
+
+    config NODE_PROTO_STACK
+        int "Task Stack size for proto"
+        default 4096
+        help
+            Task stack size of proto
+
+    config NODE_PROTO_BUFF_SIZE
+        int "Buffer size for protocol"
+        default 1024
+        help
+            Buffer size for receiving message
+endmenu
+
+menu "Network Provisioning Configuration"
+    choice NODE_PROV_SECURITY_VERSION
+        bool "Protocomm security version"
+        default NODE_PROV_SECURITY_VERSION_2
+        help
+            Wi-Fi provisioning component offers 3 security versions.
+            The example offers a choice between security version 1 and 2.
+
+        config NODE_PROV_SECURITY_VERSION_1
+            bool "Security version 1"
+            select ESP_PROTOCOMM_SUPPORT_SECURITY_VERSION_1
+
+        config NODE_PROV_SECURITY_VERSION_2
+            bool "Security version 2"
+            select ESP_PROTOCOMM_SUPPORT_SECURITY_VERSION_2
+    endchoice
+
+    choice NODE_PROV_MODE
+        bool "Security version 2 mode"
+        depends on NODE_PROV_SECURITY_VERSION_2
+        default NODE_PROV_SEC2_DEV_MODE
+
+        config NODE_PROV_SEC2_DEV_MODE
+            bool "Security version 2 development mode"
+            depends on NODE_PROV_SECURITY_VERSION_2
+            help
+                This enables the development mode for
+                security version 2.
+                Please note that this mode is NOT recommended for production purpose.
+
+        config NODE_PROV_SEC2_PROD_MODE
+            bool "Security version 2 production mode"
+            depends on NODE_PROV_SECURITY_VERSION_2
+            help
+                This enables the production mode for
+                security version 2.
+    endchoice
+
+    config NODE_RESET_PROVISIONED
+        bool
+        default n
+        prompt "Reset provisioned status of the device"
+        help
+            This erases the NVS to reset provisioned status of the device on every reboot.
+            Provisioned status is determined by the Wi-Fi STA configuration, saved on the NVS.
+
+    config NODE_RESET_PROV_MGR_ON_FAILURE
+        bool
+        default y
+        prompt "Reset provisioned credentials and state machine after session failure"
+        help
+            Enable reseting provisioned credentials and state machine after session failure.
+            This will restart the provisioning service after retries are exhausted.
+
+    config NODE_PROV_MGR_MAX_RETRY_CNT
+        int
+        default 5
+        prompt "Max retries before reseting provisioning state machine"
+        depends on NODE_RESET_PROV_MGR_ON_FAILURE
+        help
+            Set the Maximum retry to avoid reconnecting to an inexistent AP or if credentials
+            are misconfigured. Provisioned credentials are erased and internal state machine
+            is reset after this threshold is reached.
+
+    config NODE_PROV_SHOW_QR
+        bool "Show provisioning QR code"
+        default y
+        help
+            Show the QR code for provisioning.
+
+    config NODE_PROV_USING_BLUEDROID
+        bool
+        depends on (BT_BLUEDROID_ENABLED && (IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32S3))
+        select BT_BLE_42_FEATURES_SUPPORTED
+        default y
+        help
+            This enables BLE 4.2 features for Bluedroid.
+endmenu
+
+menu "Devices Configuration"
+    menuconfig NODE_DETECT_NOISE
+        bool "Detect noise"
+        default y
+        if NODE_DETECT_NOISE
+            config NODE_NOISE_GPIO_NUM
+                int "GPIO number to detect noise"
+                range 0 39
+                default 13
+        endif
+
+    menuconfig NODE_DETECT_HUMAN
+        bool "Detect human being"
+        default y
+        if NODE_DETECT_HUMAN
+            config NODE_HUMAN_GPIO_NUM
+                int "GPIO number to detect human beging"
+                range 0 39
+                default 12
+        endif
+
+    menuconfig NODE_AMBIENT_LIGHT
+        bool "Using Ambient Light Sensor"
+        default y
+        if NODE_AMBIENT_LIGHT
+            config NODE_AMBIENT_LIGHT_GPIO_NUM
+                int "GPIO number to read ambient light"
+                range 0 39
+                default 14
+            choice AMBIENT_LIGHT_SENSOR_TYPE
+                prompt "Sensor type of ambient light sensor"
+                default AMBIENT_TEMT_6000
+                config AMBIENT_TEMT_6000
+                    bool "TEMT 6000"
+                config AMBIENT_VEML_7700
+                    bool "VEML 7700"
+            endchoice
+        endif
+
+    menuconfig NODE_USING_LED_STRIP
+        bool "Using LED strip"
+        default n
+        if NODE_USING_LED_STRIP
+            config LED_STRIP_RESOLUTION_HZ
+                int "Resolution for LED strip"
+                default 10000000
+            config LED_STRIP_GPIO_NUM
+                int "GPIO number for LED strip"
+                range 0 39
+                default 23
+            config LED_NUM
+                int "number of LEDs"
+                default 64
+            config CHASE_SPEED_MS
+                int "chase speed in ms"
+                default 10
+        endif
+
+    menuconfig NODE_USING_RELAY
+        bool "Using Relay"
+        default n
+        if NODE_USING_RELAY
+            menuconfig USING_RELAY_1
+                bool "Relay 1"
+                default n
+                if USING_RELAY_1
+                    config RELAY1_GPIO_NUM
+                        int "GPIO number for Relay 1"
+                        range 0 39
+                        default 32
+                endif
+            menuconfig USING_RELAY_2
+                bool "Relay 2"
+                default n
+                if USING_RELAY_2
+                    config RELAY2_GPIO_NUM
+                        int "GPIO number for Relay 2"
+                        range 0 39
+                        default 33
+                endif
+            menuconfig USING_RELAY_3
+                bool "Relay 3"
+                default n
+                if USING_RELAY_3
+                    config RELAY3_GPIO_NUM
+                        int "GPIO number for Relay 3"
+                        range 0 39
+                        default 34
+                endif
+            menuconfig USING_RELAY_4
+                bool "Relay 4"
+                default n
+                if USING_RELAY_4
+                    config RELAY4_GPIO_NUM
+                        int "GPIO number for Relay1"
+                        range 0 39
+                        default 35
+                endif
+        endif
+
+endmenu
+
+endmenu
