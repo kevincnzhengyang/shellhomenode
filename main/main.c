@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-08 16:16:12
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-09-08 19:19:04
+ * @LastEditTime: 2023-09-10 16:09:44
  * @FilePath    : /shellhomenode/main/main.c
  * @Description : dummy node for shell home
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -17,6 +17,7 @@
 #include <esp_event.h>
 
 #include "blufi_prov.h"
+#include "shn_network.h"
 
 /* declaration of event group for the node */
 EventGroupHandle_t node_event_group;
@@ -55,7 +56,7 @@ void app_main(void)
     ESP_ERROR_CHECK(init_shn_proto());
 
     /* Launch protocol */
-    ESP_ERROR_CHECK(launch_shn_proto(NULL));
+    ESP_ERROR_CHECK(launch_shn_proto(node_event_group));
 
     int i = 0;
     while (1) {

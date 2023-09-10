@@ -52,7 +52,7 @@ esp_err_t init_shn_proto(void);
  * @param        {shn_proto_cnf} *shn_proto_config pointer to config
  * @return       {*}
  */
-esp_err_t launch_shn_proto(shn_proto_cnf *config);
+esp_err_t launch_shn_proto(shn_proto_config *config);
 #ifdef __cplusplus
 }
 #endif
