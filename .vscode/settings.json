@@ -10,7 +10,11 @@
         "esp_wifi.h": "c",
         "events_def.h": "c",
         "iot_button.h": "c",
-        "*.ipp": "c"
+        "*.ipp": "c",
+        "esp_netif.h": "c",
+        "esp_netif_types.h": "c",
+        "shn_network.h": "c",
+        "esp_netif_ip_addr.h": "c"
     },
     "idf.adapterTargetName": "esp32"
 }
