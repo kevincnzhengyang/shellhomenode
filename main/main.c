@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-08 16:16:12
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-09-10 16:09:44
+ * @LastEditTime: 2023-09-11 22:15:59
  * @FilePath    : /shellhomenode/main/main.c
  * @Description : dummy node for shell home
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -53,10 +53,10 @@ void app_main(void)
     // ESP_ERROR_CHECK(en_btn_noise_detect());
 
     /* Initialize protocol */
-    ESP_ERROR_CHECK(init_shn_proto());
+    ESP_ERROR_CHECK(init_shn_proto(NULL));
 
     /* Launch protocol */
-    ESP_ERROR_CHECK(launch_shn_proto(node_event_group));
+    ESP_ERROR_CHECK(launch_shn_proto((shn_proto_config *)node_event_group));
 
     int i = 0;
     while (1) {

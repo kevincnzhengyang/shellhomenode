@@ -25,11 +25,13 @@ extern "C" {
 #include <esp_wifi.h>
 #include <esp_event.h>
 
+#include "cJSON.h"
+
 #include "events_def.h"
 
 
 // function for handle request command
-typedef void (* shn_cmd_handle)(void *stack, void *cmd);
+typedef void (* shn_cmd_handle)(cJSON *cmd_json, void *arg);
 
 typedef struct {
     char                *req_cmd;       // request command
@@ -43,9 +45,10 @@ typedef struct {
 
 /***
  * @description : initialize protocol of ShellHome Node
+ * @param        {void} *arg pointer to user defined argument
  * @return       {*}
  */
-esp_err_t init_shn_proto(void);
+esp_err_t init_shn_proto(void *arg);
 
 /***
  * @description : launch ShellHome Node protocol
