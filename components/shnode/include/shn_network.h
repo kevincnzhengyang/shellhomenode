@@ -34,12 +34,12 @@ extern "C" {
 typedef void (* shn_cmd_handle)(cJSON *cmd_json, void *arg);
 
 typedef struct {
-    char                *req_cmd;       // request command
+    char                  *entry;       // service entry
     shn_cmd_handle       handler;       // handler for command
-} shn_cmd_table;
+} shn_sap_table;
 
 typedef struct {
-    shn_cmd_table     *cmd_table;
+    shn_sap_table     *sap_table;
     int               table_size;
 } shn_proto_config;
 

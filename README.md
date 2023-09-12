@@ -36,11 +36,11 @@ json
         "auth": "f3082c23fea",
         "api": [
             {
-                "cmd": "switch-on",
+                "entry": "switch-on",
                 "desc": "turn on switch"
             },
             {
-                "cmd": "switch-off",
+                "entry": "switch-off",
                 "desc": "turn off switch"
             }
         ]
