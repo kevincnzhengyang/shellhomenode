@@ -6,3 +6,6 @@ set(EXTRA_COMPONENT_DIRS "${EXTRA_COMPONENT_DIRS}" "${CMAKE_CURRENT_SOURCE_DIR}/
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(shellhomenode)
+
+
+target_add_binary_data(${CMAKE_PROJECT_NAME}.elf "main/api_desc.json" TEXT)

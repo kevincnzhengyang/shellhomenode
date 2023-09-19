@@ -1,0 +1,1 @@
+[{"entry":"switch","desc":"turn on switch", "params": [{"name": "value", "type": "boolean", "desc": "set value of switch"}], "result": [{"name": "value", "type": "boolean", "desc": "status value of switch"}]}]

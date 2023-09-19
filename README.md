@@ -9,7 +9,7 @@ json
 
 ## Sample
 ``` json
-// term -> node
+// [hello] term -> node
 {
     "term": "Panel_3D6FC9",
     "token": "2dc991354a3cd5fal13n9f9bckw",
@@ -22,7 +22,7 @@ json
     }
 }
 
-// node -> term
+// [hello] node -> term
 {
     "term": "Panel_3D6FC9",
     "seq": 23,
@@ -46,6 +46,64 @@ json
         ]
     }
 }
+
+// [forget] term -> node
+{
+    "term": "Panel_3D6FC9",
+    "token": "2dc991354a3cd5fal13n9f9bckw",
+    "index": 0,
+    "seq": 24,
+    "cmd": "forget",
+    "body": {
+        "text": "Mini Panel A",
+        "auth": "9f1f3kf9cdkf02fde"
+    }
+}
+
+// [forget] node -> term
+{
+    "term": "Panel_3D6FC9",
+    "seq": 24,
+    "cmd": "forget",
+    "status": 0,
+    "body": {
+        "node": "SHN_8DFC84",
+        "index": 0,
+        "text": "Node 8DFC84",
+        "auth": "f3082c23fea"
+    }
+}
+
+// [request] term -> node
+{
+    "term": "Panel_3D6FC9",
+    "token": "2dc991354a3cd5fal13n9f9bckw",
+    "index": 0,
+    "seq": 25,
+    "cmd": "request",
+    "body": {
+        "entry": "switch",
+        "params": {
+            "value": true
+        }
+    }
+}
+
+// [request] node -> term
+{
+    "term": "Panel_3D6FC9",
+    "seq": 25,
+    "cmd": "request",
+    "status": 0,
+    "body": {
+        "entry": "switch",
+        "result": {
+            "value": true
+        }
+    }
+}
+
+
 ```
 
 

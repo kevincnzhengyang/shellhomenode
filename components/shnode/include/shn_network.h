@@ -31,7 +31,8 @@ extern "C" {
 
 
 // function for handle request command
-typedef void (* shn_cmd_handle)(cJSON *cmd_json, void *arg);
+// NOTE: return 0 means success, > 0 means error happened
+typedef int (* shn_cmd_handle)(const cJSON *cmd_json, const cJSON *rsp_json, void *arg);
 
 typedef struct {
     char                  *entry;       // service entry
@@ -56,6 +57,7 @@ esp_err_t init_shn_proto(void *arg);
  * @return       {*}
  */
 esp_err_t launch_shn_proto(shn_proto_config *config);
+
 #ifdef __cplusplus
 }
 #endif
