@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-08 18:40:25
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-09-20 21:30:32
+ * @LastEditTime: 2023-09-20 23:02:40
  * @FilePath    : /shellhomenode/components/shnode/src/shn_network.c
  * @Description :
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -85,6 +85,11 @@ typedef struct
     char addr_str[ADDR_STR_ELN];    // remote addr in string
 } node_term_info;
 
+typedef struct {
+    char                  *entry;       // service entry
+    shn_cmd_handle       handler;       // handler for command
+} shn_sap_entry;
+
 typedef struct
 {
     char                   node_name[NODE_NAME_LEN];    // node physical name
@@ -93,7 +98,8 @@ typedef struct
     int                                 terms_index;    // last terminal index
     struct sockaddr_in6                 server_addr;    // UDP server address
     struct sockaddr_storage             source_addr;    // UDP client address
-    shn_proto_config                        *config;    // handler table
+    shn_sap_entry entry_table[CONFIG_NODE_ENTRY_MAX];   // entry table
+    int                                   entry_num;    // entry number
     int                                        sock;    // socket
     void                                *handle_arg;    // user defined argument
 } shn_proto_cb;
@@ -287,15 +293,14 @@ static esp_err_t handle_forget(int index,
     return ESP_OK;
 }
 
-static shn_sap_table *get_sap_entry(char *entry)
+static shn_cmd_handle get_sap_entry(char *entry)
 {
-    if (NULL == entry || NULL == g_node_proto.config
-        || NULL == g_node_proto.config->sap_table) return NULL;
+    if (NULL == entry || 0 == g_node_proto.entry_num) return NULL;
 
-    for (int i = 0; i < g_node_proto.config->table_size; i++) {
-        if (0 == strncmp(g_node_proto.config->sap_table[i].entry,
+    for (int i = 0; i < g_node_proto.entry_num; i++) {
+        if (0 == strncmp(g_node_proto.entry_table[i].entry,
                             entry, strlen(entry))) {
-            return &g_node_proto.config->sap_table[i];
+            return g_node_proto.entry_table[i].handler;
         }
     }
     return NULL;
@@ -310,7 +315,7 @@ static esp_err_t handle_request(int index,
         return ESP_FAIL;
     }
 
-    if (NULL == g_node_proto.config) {
+    if (0 == g_node_proto.entry_num) {
         ESP_LOGE(NET_TAG, "can't handle request without config\n");
         respond_cmd(json_rsp, CODE_NOT_IMPLEMENT);
         return ESP_FAIL;
@@ -326,21 +331,16 @@ static esp_err_t handle_request(int index,
     json_params = cJSON_GetObjectItemCaseSensitive(json_cmd_body, "params");
 
     // find entry and handle the request
-    shn_sap_table *sap = get_sap_entry(json_entry->valuestring);
-    if (NULL == sap) {
+    shn_cmd_handle entry = get_sap_entry(json_entry->valuestring);
+    if (NULL == entry) {
         ESP_LOGE(NET_TAG, "unknown entry [%s]\n", json_entry->valuestring);
         respond_cmd(json_rsp, CODE_UNKNOWN_ENTRY);
-        return ESP_FAIL;
-    }
-    if (NULL == sap->handler) {
-        ESP_LOGE(NET_TAG, "empty handle for entry [%s]\n", json_entry->valuestring);
-        respond_cmd(json_rsp, CODE_EMPTY_HANDLE);
         return ESP_FAIL;
     }
     ESP_LOGI(NET_TAG, "entry [%s] processing\n", json_entry->valuestring);
 
     // call handler and respond
-    int sap_res = sap->handler(json_params, json_rsp, g_node_proto.handle_arg);
+    int sap_res = entry(json_params, json_rsp, g_node_proto.handle_arg);
     if (0 != sap_res) {
         sap_res += CODE_ENTRY_ERR_BASE;
     }
@@ -554,8 +554,6 @@ end:
 
 static void udp_server_task(void *arg)
 {
-    g_node_proto.config = (shn_proto_config *)arg;
-
     char rx_buffer[CONFIG_NODE_PROTO_BUFF_SIZE];
     memset(rx_buffer, 0, CONFIG_NODE_PROTO_BUFF_SIZE);
 
@@ -690,18 +688,35 @@ esp_err_t init_shn_proto(void *arg)
 }
 
 /***
- * @description : launch ShellHome Node protocol
- * @param        {config} *shn_proto_config pointer to config
+ * @description : register an entry into protocol
+ * @param        {char} *entry: name of entry
+ * @param        {shn_cmd_handle} *handler: pointer to handler
  * @return       {*}
  */
-esp_err_t launch_shn_proto(shn_proto_config *config)
+esp_err_t register_entry(const char *entry, shn_cmd_handle handler)
 {
-    if (NULL == config) {
-        ESP_LOGE(NET_TAG, "launch proto without request config\n");
-        return ESP_FAIL;
-    }
+    if (NULL == entry || NULL == handler) return ESP_FAIL;
 
+    if (CONFIG_NODE_ENTRY_MAX <= g_node_proto.entry_num) {
+        ESP_LOGE(NET_TAG, "entry overflow: %d\n", g_node_proto.entry_num);
+        return ESP_FAIL;
+    } else {
+        shn_sap_entry *sap_entry = &g_node_proto.entry_table[g_node_proto.entry_num];
+        if (NULL != sap_entry->entry) free(sap_entry->entry);
+        sap_entry->entry = strdup(entry);
+        sap_entry->handler = handler;
+        g_node_proto.entry_num++;
+    }
+    return ESP_OK;
+}
+
+/***
+ * @description : launch ShellHome Node protocol
+ * @return       {*}
+ */
+esp_err_t launch_shn_proto(void)
+{
     xTaskCreate(udp_server_task, "proto_server",
-        CONFIG_NODE_PROTO_STACK, (void *)config, 5, NULL);
+        CONFIG_NODE_PROTO_STACK, NULL, 5, NULL);
     return ESP_OK;
 }

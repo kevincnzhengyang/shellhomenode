@@ -46,6 +46,12 @@ menu "Protocol Service"
         default 1024
         help
             Buffer size for receiving message
+
+    config NODE_ENTRY_MAX
+        int "Maximum number of entry"
+        default 8
+        help
+            Maximum number of entry in the node
 endmenu
 
 menu "Network Provisioning Configuration"

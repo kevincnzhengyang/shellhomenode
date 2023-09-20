@@ -34,16 +34,6 @@ extern "C" {
 // NOTE: return 0 means success, > 0 means error happened
 typedef int (* shn_cmd_handle)(const cJSON *cmd_json, const cJSON *rsp_json, void *arg);
 
-typedef struct {
-    char                  *entry;       // service entry
-    shn_cmd_handle       handler;       // handler for command
-} shn_sap_table;
-
-typedef struct {
-    shn_sap_table     *sap_table;
-    int               table_size;
-} shn_proto_config;
-
 /***
  * @description : initialize protocol of ShellHome Node
  * @param        {void} *arg pointer to user defined argument
@@ -52,11 +42,18 @@ typedef struct {
 esp_err_t init_shn_proto(void *arg);
 
 /***
- * @description : launch ShellHome Node protocol
- * @param        {shn_proto_cnf} *shn_proto_config pointer to config
+ * @description : register an entry into protocol
+ * @param        {char} *entry: name of entry
+ * @param        {shn_cmd_handle} handler: pointer to handler
  * @return       {*}
  */
-esp_err_t launch_shn_proto(shn_proto_config *config);
+esp_err_t register_entry(const char *entry, shn_cmd_handle handler);
+
+/***
+ * @description : launch ShellHome Node protocol
+ * @return       {*}
+ */
+esp_err_t launch_shn_proto(void);
 
 #ifdef __cplusplus
 }
