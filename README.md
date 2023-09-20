@@ -2,7 +2,6 @@
 Smart node in Shell Home
 
 
-
 # Message Format
 
 json
@@ -12,7 +11,7 @@ json
 // [hello] term -> node
 {
     "term": "Panel_3D6FC9",
-    "token": "2dc991354a3cd5fal13n9f9bckw",
+    "ds": "2dc991354a3cd5fal13n9f9bckw",
     "index": -1,
     "seq": 23,
     "cmd": "hello",
@@ -50,7 +49,7 @@ json
 // [forget] term -> node
 {
     "term": "Panel_3D6FC9",
-    "token": "2dc991354a3cd5fal13n9f9bckw",
+    "ds": "2dc991354a3cd5fal13n9f9bckw",
     "index": 0,
     "seq": 24,
     "cmd": "forget",
@@ -77,7 +76,7 @@ json
 // [request] term -> node
 {
     "term": "Panel_3D6FC9",
-    "token": "2dc991354a3cd5fal13n9f9bckw",
+    "ds": "2dc991354a3cd5fal13n9f9bckw",
     "index": 0,
     "seq": 25,
     "cmd": "request",
@@ -122,6 +121,7 @@ idf.py add-dependency "espressif/button^3.0.1"
 
 
 ``` bash
+
 avahi-browse -tpk -r _shnode._udp
 
 #Status (+ or =)
@@ -130,4 +130,5 @@ avahi-browse -tpk -r _shnode._udp
 #Service name ("sybo")
 #Service type ("Remote Disk Management")
 #Domain ("local")
+
 ```

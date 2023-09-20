@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-08 16:16:12
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-09-19 22:28:10
+ * @LastEditTime: 2023-09-20 21:55:16
  * @FilePath    : /shellhomenode/main/main.c
  * @Description : dummy node for shell home
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -105,4 +105,3 @@ void app_main(void)
         vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
 }
-

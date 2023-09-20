@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-08 18:40:25
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-09-19 22:15:06
+ * @LastEditTime: 2023-09-20 21:30:32
  * @FilePath    : /shellhomenode/components/shnode/src/shn_network.c
  * @Description :
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -361,7 +361,7 @@ static cmd_handle g_cmd_tab[CMD_BUTT] =
 static esp_err_t process_udp_msg(char *buff, int size)
 {
     esp_err_t res = ESP_FAIL;
-    const cJSON *json_term = NULL, *json_token = NULL, *json_index = NULL,
+    const cJSON *json_term = NULL, *json_ds = NULL, *json_index = NULL,
             *json_seq = NULL, *json_cmd = NULL, *json_body = NULL;
     cJSON *json_rsp = NULL, *root = NULL;
     int ind = 0;    // var for index
@@ -383,16 +383,16 @@ static esp_err_t process_udp_msg(char *buff, int size)
         goto end;
     }
 
-    // get term, token, index, seq, cmd and body
+    // get term, ds, index, seq, cmd and body
     json_term = cJSON_GetObjectItemCaseSensitive(root, "term");
     if (!cJSON_IsString(json_term) || (NULL == json_term->valuestring)) {
         ESP_LOGE(NET_TAG, "JSON failed to get string element [term]\n");
         respond_cmd(json_rsp, CODE_MISSING_TERM);
         goto end;
     }
-    json_token = cJSON_GetObjectItemCaseSensitive(root, "token");
-    if (!cJSON_IsString(json_token) || (NULL == json_token->valuestring)) {
-        ESP_LOGE(NET_TAG, "JSON failed to get string element [token]\n");
+    json_ds = cJSON_GetObjectItemCaseSensitive(root, "ds");
+    if (!cJSON_IsString(json_ds) || (NULL == json_ds->valuestring)) {
+        ESP_LOGE(NET_TAG, "JSON failed to get string element [ds]\n");
         respond_cmd(json_rsp, CODE_MISSING_TOKEN);
         goto end;
     }
@@ -436,7 +436,7 @@ static esp_err_t process_udp_msg(char *buff, int size)
         goto end;
     }
 
-    // todo check token
+    // todo check digital signature
     uint8_t sha_text[32];
     mbedtls_md_context_t ctx;
     mbedtls_md_type_t md_type = MBEDTLS_MD_SHA256;
@@ -447,7 +447,7 @@ static esp_err_t process_udp_msg(char *buff, int size)
     // mbedtls_md_finish(&ctx, sha_text);
     mbedtls_md_free(&ctx);
 
-    ESP_LOGD(NET_TAG, "msg token = %s\n", json_token->valuestring);
+    ESP_LOGD(NET_TAG, "msg ds = %s\n", json_ds->valuestring);
 
     cmd_type_enum cmd_type = get_cmd_type(json_cmd->valuestring);
     if (CMD_BUTT == cmd_type) {
