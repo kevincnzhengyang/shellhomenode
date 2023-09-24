@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-08 16:16:12
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-09-20 22:39:42
+ * @LastEditTime: 2023-09-24 23:53:34
  * @FilePath    : /shellhomenode/main/main.c
  * @Description : dummy node for shell home
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -21,6 +21,7 @@
 #include "blufi_prov.h"
 #include "shn_network.h"
 #include "simple_switch.h"
+#include "sh_led_strip.h"
 
 /* declaration of event group for the node */
 EventGroupHandle_t node_event_group;
@@ -60,6 +61,9 @@ void app_main(void)
 
     /* Register Simple Switch */
     ESP_ERROR_CHECK(register_simple_switch());
+
+    /* Register Simple Switch */
+    ESP_ERROR_CHECK(register_led_strip());
 
     /* Launch protocol */
     ESP_ERROR_CHECK(launch_shn_proto());

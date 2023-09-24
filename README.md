@@ -83,7 +83,12 @@ json
     "body": {
         "entry": "switch",
         "params": {
-            "value": true
+            "slots": [
+                {
+                    "index": 0,
+                    "value": true
+                }
+            ]
         }
     }
 }
@@ -97,7 +102,24 @@ json
     "body": {
         "entry": "switch",
         "result": {
-            "value": true
+            "slots": [
+                {
+                    "index": 0,
+                    "value": true
+                },
+                {
+                    "index": 1,
+                    "value": false
+                },
+                {
+                    "index": 2,
+                    "value": true
+                },
+                {
+                    "index": 3,
+                    "value": false
+                }
+            ]
         }
     }
 }

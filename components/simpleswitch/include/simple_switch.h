@@ -16,6 +16,17 @@ extern "C" {
 
 #include "shn_network.h"
 
+typedef enum {
+    SS_ENTRY_OK,
+    SS_ENTRY_INVALID_PARAM,
+    SS_ENTRY_MISSING_SLOTS,
+    SS_ENTRY_MISSING_INDEX,
+    SS_ENTRY_MISSING_VALUE,
+    SS_ENTRY_INVALID_INDEX,
+    SS_ENTRY_NOT_CONFIGED,
+    SS_ENTRY_RESULT_ERROR,
+} SimpleSwitchErrEnum;
+
 /***
  * @description : init simple switch
  * @return       {*}
