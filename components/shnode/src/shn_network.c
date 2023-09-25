@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-08 18:40:25
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-09-20 23:02:40
+ * @LastEditTime: 2023-09-25 22:32:16
  * @FilePath    : /shellhomenode/components/shnode/src/shn_network.c
  * @Description :
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -705,6 +705,7 @@ esp_err_t register_entry(const char *entry, shn_cmd_handle handler)
         if (NULL != sap_entry->entry) free(sap_entry->entry);
         sap_entry->entry = strdup(entry);
         sap_entry->handler = handler;
+        ESP_LOGI(NET_TAG, "entry %s @ %d\n", entry, g_node_proto.entry_num);
         g_node_proto.entry_num++;
     }
     return ESP_OK;

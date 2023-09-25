@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-20 22:05:13
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-09-24 23:26:59
+ * @LastEditTime: 2023-09-25 22:39:04
  * @FilePath    : /shellhomenode/components/simpleswitch/src/simple_switch.c
  * @Description : Simple Switch
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -63,7 +63,7 @@ static int simple_switch_handle(const cJSON *cmd_json, const cJSON *rsp_json, vo
     }
 
     // prepare result
-    cJSON *json_body = cJSON_AddObjectToObject(rsp_json, "body");
+    cJSON *json_body = cJSON_AddObjectToObject((cJSON *)rsp_json, "body");
     if (NULL == cJSON_AddStringToObject(json_body, "entry", "switch")) {
         ESP_LOGE(SS_TAG, "Failed to encode body [entry]\n");
         return SS_ENTRY_RESULT_ERROR;

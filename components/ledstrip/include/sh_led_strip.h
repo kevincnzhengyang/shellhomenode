@@ -16,6 +16,22 @@ extern "C" {
 
 #include "shn_network.h"
 
+
+typedef enum {
+    LS_ENTRY_OK,
+    LS_ENTRY_INVALID_PARAM,
+    LS_ENTRY_MISSING_ON,
+    LS_ENTRY_MISSING_R,
+    LS_ENTRY_MISSING_G,
+    LS_ENTRY_MISSING_B,
+    LS_ENTRY_INVALID_R,
+    LS_ENTRY_INVALID_G,
+    LS_ENTRY_INVALID_B,
+    LS_ENTRY_MISSING_PERIOD,
+    LS_ENTRY_RESULT_ERROR,
+} LEDStripErrEnum;
+
+
 /***
  * @description : init LED Strip
  * @return       {*}
