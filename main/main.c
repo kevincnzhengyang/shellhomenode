@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-08 16:16:12
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-09-25 17:02:49
+ * @LastEditTime: 2023-09-27 22:11:14
  * @FilePath    : /shellhomenode/main/main.c
  * @Description : dummy node for shell home
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -22,6 +22,8 @@
 #include "shn_network.h"
 #include "simple_switch.h"
 #include "sh_led_strip.h"
+#include "node_status.h"
+
 
 /* declaration of event group for the node */
 EventGroupHandle_t node_event_group;
@@ -41,6 +43,9 @@ void app_main(void)
 
     /* Initialize the event loop */
     ESP_ERROR_CHECK(esp_event_loop_create_default());
+
+    /* Initialize status */
+    shn_init_status();
 
     /* Initialize the wifi */
     ESP_ERROR_CHECK(init_wifi());
@@ -68,10 +73,8 @@ void app_main(void)
     /* Launch protocol */
     ESP_ERROR_CHECK(launch_shn_proto());
 
-    int i = 0;
     while (1) {
-        printf("[%d] Hello world!\n", i);
-        i++;
+        shn_flush_status();
         vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
 }

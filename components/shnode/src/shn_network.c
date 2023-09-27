@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-08 18:40:25
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-09-25 22:32:16
+ * @LastEditTime: 2023-09-27 22:27:40
  * @FilePath    : /shellhomenode/components/shnode/src/shn_network.c
  * @Description :
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -21,6 +21,7 @@
 #include "mbedtls/md.h"
 #include "mbedtls/error.h"
 
+#include "node_status.h"
 #include "shn_network.h"
 
 static const char *NET_TAG = "node_net";
@@ -683,7 +684,7 @@ esp_err_t init_shn_proto(void *arg)
         g_node_proto.server_addr.sin6_family = AF_INET6;
         g_node_proto.server_addr.sin6_port = htons(CONFIG_NODE_SERVICE_PORT);
     }
-
+    shn_state_status(NODE_RUNNING);
     return ESP_OK;
 }
 

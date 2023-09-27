@@ -2,13 +2,14 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-08 17:10:46
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-09-10 16:24:46
+ * @LastEditTime: 2023-09-27 22:11:43
  * @FilePath    : /shellhomenode/components/shnode/src/blufi_prov.c
  * @Description :
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
  */
 #include "blufi_prov.h"
 #include "iot_button.h"
+#include "node_status.h"
 
 static const char *PROV_TAG = "node_prov";
 
@@ -231,6 +232,7 @@ static void button_press_reset(void *arg, void *data)
  */
 esp_err_t en_btn_network_reset(void)
 {
+    shn_state_status(NODE_POWER_ON);
     #ifdef CONFIG_NODE_ENABLE_RESET
 
     button_config_t btn_cfg = {
@@ -280,6 +282,7 @@ esp_err_t init_wifi(void)
  */
 esp_err_t network_provision(bool forced_prov)
 {
+    shn_state_status(NODE_NETWORK_INIT);
     /* Configuration for the provisioning manager */
     wifi_prov_mgr_config_t config = {
         /* What is the Provisioning Scheme that we want ?
