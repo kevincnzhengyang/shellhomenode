@@ -7,7 +7,7 @@ menuconfig NODE_ENABLE_RESET
             int "GPIO number to reset network"
             range 0 39
             default 19 if IDF_TARGET_ESP32C3
-            default 2 if IDF_TARGET_ESP32
+            default 22 if IDF_TARGET_ESP32
     endif
 
     if NODE_ENABLE_RESET
@@ -60,7 +60,7 @@ menu "Network Provisioning Configuration"
         int "GPIO number for Status LED"
         range 0 39
         default 3 if IDF_TARGET_ESP32C3
-        default 8 if IDF_TARGET_ESP32
+        default 32 if IDF_TARGET_ESP32
     choice NODE_PROV_SECURITY_VERSION
         bool "Protocomm security version"
         default NODE_PROV_SECURITY_VERSION_2
@@ -164,10 +164,14 @@ menu "Devices Configuration"
         bool "Using Ambient Light Sensor"
         default y
         if NODE_AMBIENT_LIGHT
-            config NODE_AMBIENT_LIGHT_GPIO_NUM
-                int "GPIO number to read ambient light"
-                range 0 39
-                default 14
+            config NODE_AMBIENT_LIGHT_CHN
+                int "ADC Channel for ambient light"
+                range 0 9
+                default 3
+            config NODE_AMBIENT_LIGHT_READ_TIMER
+                int "timer in s to read data of ambient light"
+                range 1 18000
+                default 5
             choice AMBIENT_LIGHT_SENSOR_TYPE
                 prompt "Sensor type of ambient light sensor"
                 default AMBIENT_TEMT_6000

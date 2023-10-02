@@ -29,7 +29,7 @@ typedef enum {
     LS_ENTRY_INVALID_B,
     LS_ENTRY_MISSING_PERIOD,
     LS_ENTRY_RESULT_ERROR,
-} LEDStripErrEnum;
+} LEDStrip_Err_Enum;
 
 
 /***

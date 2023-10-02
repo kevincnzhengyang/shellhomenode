@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-08 16:16:12
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-09-27 22:11:14
+ * @LastEditTime: 2023-10-02 20:51:58
  * @FilePath    : /shellhomenode/main/main.c
  * @Description : dummy node for shell home
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -20,9 +20,16 @@
 
 #include "blufi_prov.h"
 #include "shn_network.h"
+#ifdef CONFIG_NODE_USING_RELAY
 #include "simple_switch.h"
+#endif /* CONFIG_NODE_USING_RELAY */
+#ifdef CONFIG_NODE_USING_LED_STRIP
 #include "sh_led_strip.h"
+#endif /* CONFIG_NODE_USING_LED_STRIP */
 #include "node_status.h"
+#ifdef CONFIG_NODE_AMBIENT_LIGHT
+#include "sensor_ambient.h"
+#endif /* CONFIG_NODE_AMBIENT_LIGHT */
 
 
 /* declaration of event group for the node */
@@ -64,11 +71,20 @@ void app_main(void)
     /* Initialize protocol */
     ESP_ERROR_CHECK(init_shn_proto(NULL));
 
+#ifdef CONFIG_NODE_USING_RELAY
     /* Register Simple Switch */
-    ESP_ERROR_CHECK(register_simple_switch());
+    // ESP_ERROR_CHECK(register_simple_switch());
+#endif /* CONFIG_NODE_USING_RELAY */
 
-    /* Register Simple Switch */
-    ESP_ERROR_CHECK(register_led_strip());
+#ifdef CONFIG_NODE_USING_LED_STRIP
+    /* Register LED Strip */
+    // ESP_ERROR_CHECK(register_led_strip());
+#endif /* CONFIG_NODE_USING_LED_STRIP */
+
+#ifdef CONFIG_NODE_AMBIENT_LIGHT
+    /* Register Sensor ambient light */
+    ESP_ERROR_CHECK(register_sensor_ambient());
+#endif /* CONFIG_NODE_AMBIENT_LIGHT */
 
     /* Launch protocol */
     ESP_ERROR_CHECK(launch_shn_proto());
