@@ -164,10 +164,6 @@ menu "Devices Configuration"
         bool "Using Ambient Light Sensor"
         default y
         if NODE_AMBIENT_LIGHT
-            config NODE_AMBIENT_LIGHT_CHN
-                int "ADC Channel for ambient light"
-                range 0 9
-                default 3
             config NODE_AMBIENT_LIGHT_READ_TIMER
                 int "timer in s to read data of ambient light"
                 range 1 18000
@@ -180,6 +176,29 @@ menu "Devices Configuration"
                 config AMBIENT_VEML_7700
                     bool "VEML 7700"
             endchoice
+            config NODE_AMBIENT_LIGHT_CHN
+                int "ADC Channel for TEMT6000"
+                depends on AMBIENT_TEMT_6000
+                range 0 9
+                default 3
+            config NODE_AMBIENT_LIGHT_SDA
+                int "SDA port number for VEML7700"
+                depends on AMBIENT_VEML_7700
+                range 0 39
+                default 25
+            config NODE_AMBIENT_LIGHT_SCL
+                int "SCL port number for VEML7700"
+                depends on AMBIENT_VEML_7700
+                range 0 39
+                default 26
+            config NODE_AMBIENT_LIGHT_I2C_NUM
+                int "I2C number for VEML7700"
+                depends on AMBIENT_VEML_7700
+                default 0
+            config NODE_AMBIENT_LIGHT_I2C_FREQUENCY
+                int "frequnce for I2C"
+                depends on AMBIENT_VEML_7700
+                default 400000
         endif
 
     menuconfig NODE_USING_LED_STRIP

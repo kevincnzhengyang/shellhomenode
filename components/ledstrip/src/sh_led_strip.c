@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-24 23:05:20
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-09-25 22:38:19
+ * @LastEditTime: 2023-10-02 22:22:03
  * @FilePath    : /shellhomenode/components/ledstrip/src/sh_led_strip.c
  * @Description :
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -169,19 +169,19 @@ static int dimmable_handle(const cJSON *cmd_json, const cJSON *rsp_json, void *a
     // get on
     cJSON const *json_on = cJSON_GetObjectItemCaseSensitive(cmd_json, "on");
     if (!cJSON_IsBool(json_on)) {
-        ESP_LOGE(LS_TAG, "JSON failed to get boolean element [on]\n");
+        ESP_LOGE(LS_TAG, "JSON failed to get boolean element [on]");
         return LS_ENTRY_MISSING_ON;
     }
 
     // prepare result
     cJSON *json_body = cJSON_AddObjectToObject((cJSON *)rsp_json, "body");
     if (NULL == cJSON_AddStringToObject(json_body, "entry", "switch")) {
-        ESP_LOGE(LS_TAG, "Failed to encode body [entry]\n");
+        ESP_LOGE(LS_TAG, "Failed to encode body [entry]");
         return LS_ENTRY_RESULT_ERROR;
     }
     cJSON *json_result = cJSON_AddObjectToObject(json_body, "result");
     if (cJSON_AddBoolToObject(json_result, "on", cJSON_IsTrue(json_on)) == NULL) {
-        ESP_LOGE(LS_TAG, "Failed to encode on\n");
+        ESP_LOGE(LS_TAG, "Failed to encode on");
         return LS_ENTRY_RESULT_ERROR;
     }
 
@@ -193,29 +193,29 @@ static int dimmable_handle(const cJSON *cmd_json, const cJSON *rsp_json, void *a
     // get RGB value and set
     const cJSON *json_r = cJSON_GetObjectItemCaseSensitive(cmd_json, "r");
     if (!cJSON_IsNumber(json_r)) {
-        ESP_LOGE(LS_TAG, "JSON failed to get element [r]\n");
+        ESP_LOGE(LS_TAG, "JSON failed to get element [r]");
         return LS_ENTRY_MISSING_R;
     }
     if (0 > json_r->valueint || 255 < json_r->valueint) {
-        ESP_LOGE(LS_TAG, "invalid R 0~255 [%d]\n", json_r->valueint);
+        ESP_LOGE(LS_TAG, "invalid R 0~255 [%d]", json_r->valueint);
         return LS_ENTRY_INVALID_R;
     }
     const cJSON *json_g = cJSON_GetObjectItemCaseSensitive(cmd_json, "g");
     if (!cJSON_IsNumber(json_g)) {
-        ESP_LOGE(LS_TAG, "JSON failed to get element [r]\n");
+        ESP_LOGE(LS_TAG, "JSON failed to get element [r]");
         return LS_ENTRY_MISSING_G;
     }
     if (0 > json_g->valueint || 255 < json_g->valueint) {
-        ESP_LOGE(LS_TAG, "invalid G 0~255 [%d]\n", json_g->valueint);
+        ESP_LOGE(LS_TAG, "invalid G 0~255 [%d]", json_g->valueint);
         return LS_ENTRY_INVALID_G;
     }
     const cJSON *json_b = cJSON_GetObjectItemCaseSensitive(cmd_json, "b");
     if (!cJSON_IsNumber(json_b)) {
-        ESP_LOGE(LS_TAG, "JSON failed to get element [r]\n");
+        ESP_LOGE(LS_TAG, "JSON failed to get element [r]");
         return LS_ENTRY_MISSING_B;
     }
     if (0 > json_b->valueint || 255 < json_b->valueint) {
-        ESP_LOGE(LS_TAG, "invalid B 0~255 [%d]\n", json_b->valueint);
+        ESP_LOGE(LS_TAG, "invalid B 0~255 [%d]", json_b->valueint);
         return LS_ENTRY_INVALID_B;
     }
 
@@ -231,19 +231,19 @@ static int marquee_handle(const cJSON *cmd_json, const cJSON *rsp_json, void *ar
     // get on
     cJSON const *json_on = cJSON_GetObjectItemCaseSensitive(cmd_json, "on");
     if (NULL == json_on) {
-        ESP_LOGE(LS_TAG, "JSON failed to get element [on]\n");
+        ESP_LOGE(LS_TAG, "JSON failed to get element [on]");
         return LS_ENTRY_MISSING_ON;
     }
 
     // prepare result
     cJSON *json_body = cJSON_AddObjectToObject((cJSON *)rsp_json, "body");
     if (NULL == cJSON_AddStringToObject(json_body, "entry", "switch")) {
-        ESP_LOGE(LS_TAG, "Failed to encode body [entry]\n");
+        ESP_LOGE(LS_TAG, "Failed to encode body [entry]");
         return LS_ENTRY_RESULT_ERROR;
     }
     cJSON *json_result = cJSON_AddObjectToObject(json_body, "result");
     if (cJSON_AddBoolToObject(json_result, "on", cJSON_IsTrue(json_on)) == NULL) {
-        ESP_LOGE(LS_TAG, "Failed to encode on\n");
+        ESP_LOGE(LS_TAG, "Failed to encode on");
         return LS_ENTRY_RESULT_ERROR;
     }
 
@@ -255,7 +255,7 @@ static int marquee_handle(const cJSON *cmd_json, const cJSON *rsp_json, void *ar
     // get RGB value and set
     const cJSON *json_period = cJSON_GetObjectItemCaseSensitive(cmd_json, "period");
     if (!cJSON_IsNumber(json_period)) {
-        ESP_LOGE(LS_TAG, "JSON failed to get element [period]\n");
+        ESP_LOGE(LS_TAG, "JSON failed to get element [period]");
         return LS_ENTRY_MISSING_PERIOD;
     }
 
@@ -271,19 +271,19 @@ static int breath_handle(const cJSON *cmd_json, const cJSON *rsp_json, void *arg
     // get on
     cJSON const *json_on = cJSON_GetObjectItemCaseSensitive(cmd_json, "on");
     if (NULL == json_on) {
-        ESP_LOGE(LS_TAG, "JSON failed to get element [on]\n");
+        ESP_LOGE(LS_TAG, "JSON failed to get element [on]");
         return LS_ENTRY_MISSING_ON;
     }
 
     // prepare result
     cJSON *json_body = cJSON_AddObjectToObject((cJSON *)rsp_json, "body");
     if (NULL == cJSON_AddStringToObject(json_body, "entry", "switch")) {
-        ESP_LOGE(LS_TAG, "Failed to encode body [entry]\n");
+        ESP_LOGE(LS_TAG, "Failed to encode body [entry]");
         return LS_ENTRY_RESULT_ERROR;
     }
     cJSON *json_result = cJSON_AddObjectToObject(json_body, "result");
     if (cJSON_AddBoolToObject(json_result, "on", cJSON_IsTrue(json_on)) == NULL) {
-        ESP_LOGE(LS_TAG, "Failed to encode on\n");
+        ESP_LOGE(LS_TAG, "Failed to encode on");
         return LS_ENTRY_RESULT_ERROR;
     }
 
@@ -295,7 +295,7 @@ static int breath_handle(const cJSON *cmd_json, const cJSON *rsp_json, void *arg
     // get RGB value and set
     const cJSON *json_period = cJSON_GetObjectItemCaseSensitive(cmd_json, "period");
     if (!cJSON_IsNumber(json_period)) {
-        ESP_LOGE(LS_TAG, "JSON failed to get element [period]\n");
+        ESP_LOGE(LS_TAG, "JSON failed to get element [period]");
         return LS_ENTRY_MISSING_PERIOD;
     }
 

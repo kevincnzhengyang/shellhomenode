@@ -20,7 +20,7 @@ extern "C" {
  * @description : get instance of the sensor temt6000
  * @return       {*}
  */
-Sensor_Ambient_Lisght *tmt6000_instance(void);
+Sensor_Ambient_Lisght *temt6000_instance(void);
 
 #ifdef __cplusplus
 }

@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-08 17:10:46
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-09-27 22:11:43
+ * @LastEditTime: 2023-10-02 22:21:36
  * @FilePath    : /shellhomenode/components/shnode/src/blufi_prov.c
  * @Description :
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -103,15 +103,15 @@ static void event_handler(void* arg, esp_event_base_t event_base,
             case WIFI_PROV_CRED_RECV: {
                 wifi_sta_config_t *wifi_sta_cfg = (wifi_sta_config_t *)event_data;
                 ESP_LOGI(PROV_TAG, "Received Wi-Fi credentials"
-                         "\n\tSSID     : %s\n\tPassword : %s",
+                         "\tSSID     : %s\tPassword : %s",
                          (const char *) wifi_sta_cfg->ssid,
                          (const char *) wifi_sta_cfg->password);
                 break;
             }
             case WIFI_PROV_CRED_FAIL: {
                 wifi_prov_sta_fail_reason_t *reason = (wifi_prov_sta_fail_reason_t *)event_data;
-                ESP_LOGE(PROV_TAG, "Provisioning failed!\n\tReason : %s"
-                         "\n\tPlease reset to factory and retry provisioning",
+                ESP_LOGE(PROV_TAG, "Provisioning failed!\tReason : %s"
+                         "\tPlease reset to factory and retry provisioning",
                          (*reason == WIFI_PROV_STA_AUTH_ERROR) ?
                          "Wi-Fi station authentication failed" : "Wi-Fi access-point not found");
 #ifdef CONFIG_NODE_RESET_PROV_MGR_ON_FAILURE
@@ -215,7 +215,7 @@ static void wifi_prov_print_qr(const char *name, const char *username, const cha
     esp_qrcode_config_t cfg = ESP_QRCODE_CONFIG_DEFAULT();
     esp_qrcode_generate(&cfg, payload);
 #endif /* CONFIG_NODE_PROV_SHOW_QR */
-    ESP_LOGI(PROV_TAG, "If QR code is not visible, copy paste the below URL in a browser.\n%s?data=%s", QRCODE_BASE_URL, payload);
+    ESP_LOGI(PROV_TAG, "If QR code is not visible, copy paste the below URL in a browser.%s?data=%s", QRCODE_BASE_URL, payload);
 }
 
 static void button_press_reset(void *arg, void *data)

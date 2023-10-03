@@ -14,22 +14,28 @@
 extern "C" {
 #endif
 
-#ifdef CONFIG_IDF_TARGET_ESP32S2
+#include <stdio.h>
+#include <string.h>
 
-#define SENSOR_AMBIENT_LIGHT_ADC_CHANNEL 3
+#include "esp_err.h"
+#include "esp_log.h"
 
-#elif defined CONFIG_IDF_TARGET_ESP32 /* CONFIG_IDF_TARGET_ESP32S2 */
+// #ifdef CONFIG_IDF_TARGET_ESP32S2
 
-#define SENSOR_AMBIENT_LIGHT_ADC_CHANNEL 0
+// #define SENSOR_AMBIENT_LIGHT_ADC_CHANNEL 3
 
-#elif defined CONFIG_IDF_TARGET_ESP32C3 /* CONFIG_IDF_TARGET_ESP32 */
+// #elif defined CONFIG_IDF_TARGET_ESP32 /* CONFIG_IDF_TARGET_ESP32S2 */
 
-#define SENSOR_AMBIENT_LIGHT_ADC_CHANNEL 1
+// #define SENSOR_AMBIENT_LIGHT_ADC_CHANNEL 0
 
-#else
+// #elif defined CONFIG_IDF_TARGET_ESP32C3 /* CONFIG_IDF_TARGET_ESP32 */
 
-#error "unknow chip type"
-#endif /* CONFIG_IDF_TARGET_ESP32 */
+// #define SENSOR_AMBIENT_LIGHT_ADC_CHANNEL 1
+
+// #else
+
+// #error "unknow chip type"
+// #endif /* CONFIG_IDF_TARGET_ESP32 */
 
 typedef enum {
     SAL_ENTRY_OK,
@@ -43,7 +49,7 @@ typedef enum {
 typedef esp_err_t (*sal_init)(void * arg);
 
 // function to read lux data
-typedef esp_err_t (*sal_read)(uint32_t *o_lux);
+typedef esp_err_t (*sal_read)(float *o_lux);
 
 typedef struct
 {

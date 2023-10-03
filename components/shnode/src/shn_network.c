@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-08 18:40:25
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-09-27 22:27:40
+ * @LastEditTime: 2023-10-02 22:20:48
  * @FilePath    : /shellhomenode/components/shnode/src/shn_network.c
  * @Description :
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -143,7 +143,7 @@ static esp_err_t respond_cmd(cJSON *json_rsp, int status)
     }
 
     if (NULL == cJSON_AddNumberToObject(json_rsp, "status", status)) {
-        ESP_LOGE(NET_TAG, "Failed to encode [status]\n");
+        ESP_LOGE(NET_TAG, "Failed to encode [status]");
         return ESP_FAIL;
     }
 
@@ -188,20 +188,20 @@ static esp_err_t handle_hello(int index,
 {
     if (-1 == index
         || NULL == json_cmd_body || NULL == json_rsp) {
-        ESP_LOGE(NET_TAG, "invalid parameter\n");
+        ESP_LOGE(NET_TAG, "invalid parameter");
         return ESP_FAIL;
     }
 
     const cJSON *json_text = NULL, *json_auth = NULL;
     json_text = cJSON_GetObjectItemCaseSensitive(json_cmd_body, "text");
     if (!cJSON_IsString(json_text) || (NULL == json_text->valuestring)) {
-        ESP_LOGE(NET_TAG, "JSON failed to get string element [text]\n");
+        ESP_LOGE(NET_TAG, "JSON failed to get string element [text]");
         respond_cmd(json_rsp, CODE_MISSING_TEXT);
         return ESP_FAIL;
     }
     json_auth = cJSON_GetObjectItemCaseSensitive(json_cmd_body, "auth");
     if (!cJSON_IsString(json_auth) || (NULL == json_auth->valuestring)) {
-        ESP_LOGE(NET_TAG, "JSON failed to get string element [auth]\n");
+        ESP_LOGE(NET_TAG, "JSON failed to get string element [auth]");
         respond_cmd(json_rsp, CODE_MISSING_AUTH);
         return ESP_FAIL;
     }
@@ -212,35 +212,35 @@ static esp_err_t handle_hello(int index,
     cJSON *json_body = cJSON_AddObjectToObject(json_rsp, "body");
     node_term_info *term = &g_node_proto.terms[index];
     if (NULL == cJSON_AddStringToObject(json_body, "node", g_node_proto.node_name)) {
-        ESP_LOGE(NET_TAG, "Failed to encode body [node]\n");
+        ESP_LOGE(NET_TAG, "Failed to encode body [node]");
         return ESP_FAIL;
     }
     if (NULL == cJSON_AddNumberToObject(json_body, "index", index)) {
-        ESP_LOGE(NET_TAG, "Failed to encode body [index]\n");
+        ESP_LOGE(NET_TAG, "Failed to encode body [index]");
         return ESP_FAIL;
     }
     if (NULL == cJSON_AddNumberToObject(json_body, "seq", term->local_seq)) {
-        ESP_LOGE(NET_TAG, "Failed to encode body [seq]\n");
+        ESP_LOGE(NET_TAG, "Failed to encode body [seq]");
         return ESP_FAIL;
     } else {
         term->local_seq++;
     }
     // todo text and auth
     // if (NULL == cJSON_AddStringToObject(json_body, "text", g_node_proto.node_name)) {
-    //     ESP_LOGE(NET_TAG, "Failed to encode body [text]\n");
+    //     ESP_LOGE(NET_TAG, "Failed to encode body [text]");
     //     return ESP_FAIL;
     // }
     // if (NULL == cJSON_AddStringToObject(json_body, "auth", g_node_proto.node_name)) {
-    //     ESP_LOGE(NET_TAG, "Failed to encode body [auth]\n");
+    //     ESP_LOGE(NET_TAG, "Failed to encode body [auth]");
     //     return ESP_FAIL;
     // }
     if (NULL == cJSON_AddRawToObject(json_body, "api", g_node_proto.api_desc)) {
-        ESP_LOGE(NET_TAG, "Failed to encode body [api]\n");
+        ESP_LOGE(NET_TAG, "Failed to encode body [api]");
         return ESP_FAIL;
     }
 
     if (ESP_OK != respond_cmd(json_rsp, CODE_OK)) {
-        ESP_LOGE(NET_TAG, "Failed to response request\n");
+        ESP_LOGE(NET_TAG, "Failed to response request");
         return ESP_FAIL;
     }
     return ESP_OK;
@@ -251,11 +251,11 @@ static esp_err_t handle_forget(int index,
 {
     if (-1 == index
         || NULL == json_cmd_body || NULL == json_rsp) {
-        ESP_LOGE(NET_TAG, "invalid parameter\n");
+        ESP_LOGE(NET_TAG, "invalid parameter");
         return ESP_FAIL;
     }
 
-    ESP_LOGD(NET_TAG, "forget term [%s] @ [%d]\n",
+    ESP_LOGD(NET_TAG, "forget term [%s] @ [%d]",
                 g_node_proto.terms[index].term_name, index);
 
     // todo auth text
@@ -270,25 +270,25 @@ static esp_err_t handle_forget(int index,
     // response body
     cJSON *json_body = cJSON_AddObjectToObject(json_rsp, "body");
     if (NULL == cJSON_AddStringToObject(json_body, "node", g_node_proto.node_name)) {
-        ESP_LOGE(NET_TAG, "Failed to encode body [node]\n");
+        ESP_LOGE(NET_TAG, "Failed to encode body [node]");
         return ESP_FAIL;
     }
     if (NULL == cJSON_AddNumberToObject(json_body, "index", index)) {
-        ESP_LOGE(NET_TAG, "Failed to encode body [index]\n");
+        ESP_LOGE(NET_TAG, "Failed to encode body [index]");
         return ESP_FAIL;
     }
     // todo text and auth
     // if (NULL == cJSON_AddStringToObject(json_body, "text", g_node_proto.node_name)) {
-    //     ESP_LOGE(NET_TAG, "Failed to encode body [text]\n");
+    //     ESP_LOGE(NET_TAG, "Failed to encode body [text]");
     //     return ESP_FAIL;
     // }
     // if (NULL == cJSON_AddStringToObject(json_body, "auth", g_node_proto.node_name)) {
-    //     ESP_LOGE(NET_TAG, "Failed to encode body [auth]\n");
+    //     ESP_LOGE(NET_TAG, "Failed to encode body [auth]");
     //     return ESP_FAIL;
     // }
 
     if (ESP_OK != respond_cmd(json_rsp, CODE_OK)) {
-        ESP_LOGE(NET_TAG, "Failed to response request\n");
+        ESP_LOGE(NET_TAG, "Failed to response request");
         return ESP_FAIL;
     }
     return ESP_OK;
@@ -312,12 +312,12 @@ static esp_err_t handle_request(int index,
 {
     if (-1 == index
         || NULL == json_cmd_body || NULL == json_rsp) {
-        ESP_LOGE(NET_TAG, "invalid parameter\n");
+        ESP_LOGE(NET_TAG, "invalid parameter");
         return ESP_FAIL;
     }
 
     if (0 == g_node_proto.entry_num) {
-        ESP_LOGE(NET_TAG, "can't handle request without config\n");
+        ESP_LOGE(NET_TAG, "can't handle request without config");
         respond_cmd(json_rsp, CODE_NOT_IMPLEMENT);
         return ESP_FAIL;
     }
@@ -325,7 +325,7 @@ static esp_err_t handle_request(int index,
     const cJSON *json_entry = NULL, *json_params = NULL;
     json_entry = cJSON_GetObjectItemCaseSensitive(json_cmd_body, "entry");
     if (!cJSON_IsString(json_entry) || (NULL == json_entry->valuestring)) {
-        ESP_LOGE(NET_TAG, "JSON failed to get string element [entry]\n");
+        ESP_LOGE(NET_TAG, "JSON failed to get string element [entry]");
         respond_cmd(json_rsp, CODE_MISSING_ENTRY);
         return ESP_FAIL;
     }
@@ -334,11 +334,11 @@ static esp_err_t handle_request(int index,
     // find entry and handle the request
     shn_cmd_handle entry = get_sap_entry(json_entry->valuestring);
     if (NULL == entry) {
-        ESP_LOGE(NET_TAG, "unknown entry [%s]\n", json_entry->valuestring);
+        ESP_LOGE(NET_TAG, "unknown entry [%s]", json_entry->valuestring);
         respond_cmd(json_rsp, CODE_UNKNOWN_ENTRY);
         return ESP_FAIL;
     }
-    ESP_LOGI(NET_TAG, "entry [%s] processing\n", json_entry->valuestring);
+    ESP_LOGI(NET_TAG, "entry [%s] processing", json_entry->valuestring);
 
     // call handler and respond
     int sap_res = entry(json_params, json_rsp, g_node_proto.handle_arg);
@@ -346,7 +346,7 @@ static esp_err_t handle_request(int index,
         sap_res += CODE_ENTRY_ERR_BASE;
     }
     if (ESP_OK != respond_cmd(json_rsp, sap_res)) {
-        ESP_LOGE(NET_TAG, "Failed to response request\n");
+        ESP_LOGE(NET_TAG, "Failed to response request");
         return ESP_FAIL;
     }
     return ESP_OK;
@@ -369,7 +369,7 @@ static esp_err_t process_udp_msg(char *buff, int size)
 
     json_rsp = cJSON_CreateObject();
     if (NULL == json_rsp) {
-        ESP_LOGE(NET_TAG, "Failed to prepare JSON response\n");
+        ESP_LOGE(NET_TAG, "Failed to prepare JSON response");
         goto end;
     }
 
@@ -378,7 +378,7 @@ static esp_err_t process_udp_msg(char *buff, int size)
         const char *error_ptr = cJSON_GetErrorPtr();
         if (NULL != error_ptr)
         {
-            ESP_LOGE(NET_TAG, "Parse JSON error before: %s\n", error_ptr);
+            ESP_LOGE(NET_TAG, "Parse JSON error before: %s", error_ptr);
         }
         respond_cmd(json_rsp, CODE_INVALID_JSON);
         goto end;
@@ -387,53 +387,53 @@ static esp_err_t process_udp_msg(char *buff, int size)
     // get term, ds, index, seq, cmd and body
     json_term = cJSON_GetObjectItemCaseSensitive(root, "term");
     if (!cJSON_IsString(json_term) || (NULL == json_term->valuestring)) {
-        ESP_LOGE(NET_TAG, "JSON failed to get string element [term]\n");
+        ESP_LOGE(NET_TAG, "JSON failed to get string element [term]");
         respond_cmd(json_rsp, CODE_MISSING_TERM);
         goto end;
     }
     json_ds = cJSON_GetObjectItemCaseSensitive(root, "ds");
     if (!cJSON_IsString(json_ds) || (NULL == json_ds->valuestring)) {
-        ESP_LOGE(NET_TAG, "JSON failed to get string element [ds]\n");
+        ESP_LOGE(NET_TAG, "JSON failed to get string element [ds]");
         respond_cmd(json_rsp, CODE_MISSING_TOKEN);
         goto end;
     }
     json_index = cJSON_GetObjectItemCaseSensitive(root, "index");
     if (!cJSON_IsNumber(json_index)) {
-        ESP_LOGE(NET_TAG, "JSON failed to get number element [index]\n");
+        ESP_LOGE(NET_TAG, "JSON failed to get number element [index]");
         respond_cmd(json_rsp, CODE_MISSING_INDEX);
         goto end;
     }
     ind = json_index->valueint;
     json_seq = cJSON_GetObjectItemCaseSensitive(root, "seq");
     if (!cJSON_IsNumber(json_seq)) {
-        ESP_LOGE(NET_TAG, "JSON failed to get number element [seq]\n");
+        ESP_LOGE(NET_TAG, "JSON failed to get number element [seq]");
         respond_cmd(json_rsp, CODE_MISSING_SEQ);
         goto end;
     }
     json_cmd = cJSON_GetObjectItemCaseSensitive(root, "cmd");
     if (!cJSON_IsString(json_cmd) || (NULL == json_cmd->valuestring)) {
-        ESP_LOGE(NET_TAG, "JSON failed to get string element [cmd]\n");
+        ESP_LOGE(NET_TAG, "JSON failed to get string element [cmd]");
         respond_cmd(json_rsp, CODE_MISSING_CMD);
         goto end;
     }
     json_body = cJSON_GetObjectItemCaseSensitive(root, "body");
     if (!cJSON_IsObject(json_body)) {
-        ESP_LOGE(NET_TAG, "JSON failed to get object element [body]\n");
+        ESP_LOGE(NET_TAG, "JSON failed to get object element [body]");
         respond_cmd(json_rsp, CODE_MISSING_BODY);
         goto end;
     }
 
     // init response
     if (NULL == cJSON_AddStringToObject(json_rsp, "term", json_term->valuestring)) {
-        ESP_LOGE(NET_TAG, "Failed to encode [term]\n");
+        ESP_LOGE(NET_TAG, "Failed to encode [term]");
         goto end;
     }
     if (NULL == cJSON_AddNumberToObject(json_rsp, "seq", json_seq->valueint)) {
-        ESP_LOGE(NET_TAG, "Failed to encode [term]\n");
+        ESP_LOGE(NET_TAG, "Failed to encode [term]");
         goto end;
     }
     if (NULL == cJSON_AddStringToObject(json_rsp, "cmd", json_cmd->valuestring)) {
-        ESP_LOGE(NET_TAG, "Failed to encode [cmd]\n");
+        ESP_LOGE(NET_TAG, "Failed to encode [cmd]");
         goto end;
     }
 
@@ -448,11 +448,11 @@ static esp_err_t process_udp_msg(char *buff, int size)
     // mbedtls_md_finish(&ctx, sha_text);
     mbedtls_md_free(&ctx);
 
-    ESP_LOGD(NET_TAG, "msg ds = %s\n", json_ds->valuestring);
+    ESP_LOGD(NET_TAG, "msg ds = %s", json_ds->valuestring);
 
     cmd_type_enum cmd_type = get_cmd_type(json_cmd->valuestring);
     if (CMD_BUTT == cmd_type) {
-        ESP_LOGE(NET_TAG, "unknown cmd [%s]\n", json_cmd->valuestring);
+        ESP_LOGE(NET_TAG, "unknown cmd [%s]", json_cmd->valuestring);
         respond_cmd(json_rsp, CODE_UNKNOWN_CMD);
         goto end;
     }
@@ -461,7 +461,7 @@ static esp_err_t process_udp_msg(char *buff, int size)
     if (-1 != ind) {
         if (CONFIG_NODE_TERM_NUM <= ind) {
             // invalid index
-            ESP_LOGE(NET_TAG, "invalid index [%d], overflow\n", ind);
+            ESP_LOGE(NET_TAG, "invalid index [%d], overflow", ind);
             respond_cmd(json_rsp, CODE_INVALID_INDEX);
             goto end;
         }
@@ -471,7 +471,7 @@ static esp_err_t process_udp_msg(char *buff, int size)
                             g_node_proto.terms[ind].term_name,
                             strlen(g_node_proto.terms[ind].term_name))) {
             // wrong term info
-            ESP_LOGE(NET_TAG, "wrong term [%s]@[%d]\n",
+            ESP_LOGE(NET_TAG, "wrong term [%s]@[%d]",
                 json_term->valuestring,
                 ind);
             respond_cmd(json_rsp, CODE_INVALID_TERM);
@@ -480,7 +480,7 @@ static esp_err_t process_udp_msg(char *buff, int size)
             // compare and save new seq
             if (g_node_proto.terms[ind].remote_seq == json_seq->valueint) {
                 // duplicated cmd
-                ESP_LOGE(NET_TAG, "duplicated cmd seq [%d]\n",
+                ESP_LOGE(NET_TAG, "duplicated cmd seq [%d]",
                     json_seq->valueint);
                 respond_cmd(json_rsp, CODE_DUPLICATED_SEQ);
                 goto end;
@@ -492,7 +492,7 @@ static esp_err_t process_udp_msg(char *buff, int size)
         }
     } else {
         if (CMD_HELLO != cmd_type) {
-            ESP_LOGE(NET_TAG, "invalid -1 index for cmd[%s]\n", json_cmd->valuestring);
+            ESP_LOGE(NET_TAG, "invalid -1 index for cmd[%s]", json_cmd->valuestring);
             respond_cmd(json_rsp, CODE_INVALID_INDEX);
             goto end;
         }
@@ -505,7 +505,7 @@ static esp_err_t process_udp_msg(char *buff, int size)
                             json_term->valuestring,
                             strlen(g_node_proto.terms[ind].term_name))) {
                 // found it
-                ESP_LOGD(NET_TAG, "found term [%s]@[%d]\n",
+                ESP_LOGD(NET_TAG, "found term [%s]@[%d]",
                         json_term->valuestring,
                         ind);
                 // save remote seq and incr local seq
@@ -519,7 +519,7 @@ static esp_err_t process_udp_msg(char *buff, int size)
             // not found
             if (CONFIG_NODE_TERM_NUM <= ind) {
                 // term overflow
-                ESP_LOGE(NET_TAG, "overflow for term[%s]\n", json_term->valuestring);
+                ESP_LOGE(NET_TAG, "overflow for term[%s]", json_term->valuestring);
                 respond_cmd(json_rsp, CODE_OVERFLOW_TERM);
                 goto end;
             } else {
@@ -539,7 +539,7 @@ static esp_err_t process_udp_msg(char *buff, int size)
                                     g_node_proto.terms[ind].addr_str,
                                     sizeof(g_node_proto.terms[ind].addr_str) - 1);
                 }
-                ESP_LOGI(NET_TAG, "hello term [%s] from [%s]\n",
+                ESP_LOGI(NET_TAG, "hello term [%s] from [%s]",
                     json_term->valuestring, g_node_proto.terms[ind].addr_str);
                 g_node_proto.terms_index++;
             }
@@ -654,7 +654,7 @@ esp_err_t init_shn_proto(void *arg)
 
     // todo load api description json
     g_node_proto.api_desc = (char *)api_desc_start;
-    ESP_LOGI(NET_TAG, "api desc = %s\n", g_node_proto.api_desc);
+    ESP_LOGI(NET_TAG, "api desc = %s", g_node_proto.api_desc);
 
     // esp_netif_ip_info_t ip_info;
     // esp_netif_get_ip_info(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"), &ip_info);
@@ -667,10 +667,10 @@ esp_err_t init_shn_proto(void *arg)
 
     esp_err_t err = start_mdns();
     if (ESP_OK != err) {
-        ESP_LOGE(NET_TAG, "MDNS Init failed: %d\n", err);
+        ESP_LOGE(NET_TAG, "MDNS Init failed: %d", err);
         return ESP_FAIL;
     } else {
-        ESP_LOGI(NET_TAG, "MDNS Init OK\n");
+        ESP_LOGI(NET_TAG, "MDNS Init OK");
     }
 
     if (!g_using_ipv6) {
@@ -699,14 +699,14 @@ esp_err_t register_entry(const char *entry, shn_cmd_handle handler)
     if (NULL == entry || NULL == handler) return ESP_FAIL;
 
     if (CONFIG_NODE_ENTRY_MAX <= g_node_proto.entry_num) {
-        ESP_LOGE(NET_TAG, "entry overflow: %d\n", g_node_proto.entry_num);
+        ESP_LOGE(NET_TAG, "entry overflow: %d", g_node_proto.entry_num);
         return ESP_FAIL;
     } else {
         shn_sap_entry *sap_entry = &g_node_proto.entry_table[g_node_proto.entry_num];
         if (NULL != sap_entry->entry) free(sap_entry->entry);
         sap_entry->entry = strdup(entry);
         sap_entry->handler = handler;
-        ESP_LOGI(NET_TAG, "entry %s @ %d\n", entry, g_node_proto.entry_num);
+        ESP_LOGI(NET_TAG, "entry %s @ %d", entry, g_node_proto.entry_num);
         g_node_proto.entry_num++;
     }
     return ESP_OK;
