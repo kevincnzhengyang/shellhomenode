@@ -147,7 +147,8 @@ menu "Devices Configuration"
             config NODE_NOISE_GPIO_NUM
                 int "GPIO number to detect noise"
                 range 0 39
-                default 13
+                default 8 if IDF_TARGET_ESP32C3
+                default 13 if IDF_TARGET_ESP32
         endif
 
     menuconfig NODE_DETECT_HUMAN
