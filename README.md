@@ -139,6 +139,8 @@ idf.py add-dependency "espressif/mdns^1.2.1"
 
 idf.py add-dependency "espressif/button^3.0.1"
 
+idf.py add-dependency "espressif/led_strip^2.4.3"
+
 ```
 
 

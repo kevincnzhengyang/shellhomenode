@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-10-03 19:27:51
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-10-03 21:38:51
+ * @LastEditTime: 2023-10-04 22:31:00
  * @FilePath    : /shellhomenode/components/ambient/src/ambient_veml7700.c
  * @Description : ambient light sensor VEML7700
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -23,9 +23,9 @@
 
 #include "ambient_veml7700.h"
 
+#ifdef CONFIG_AMBIENT_VEML_7700
 static const char *S_TAG = "veml7700";
 
-#ifdef CONFIG_AMBIENT_VEML_7700
 // from  https://github.com/UncleRus/esp-idf-lib/tree/master/components/veml7700
 // --- begin ---
 #define VEML7700_I2C_ADDR UINT8_C(0x10) /*!< Sensor slave I2C address */

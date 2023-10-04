@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-20 22:05:13
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-10-02 22:22:18
+ * @LastEditTime: 2023-10-04 22:34:39
  * @FilePath    : /shellhomenode/components/simpleswitch/src/simple_switch.c
  * @Description : Simple Switch
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -12,6 +12,7 @@
 
 #include "simple_switch.h"
 
+#ifdef CONFIG_NODE_USING_RELAY
 static const char *SS_TAG = "simple_switch";
 
 #define SS_MAX_RELAY_NUM        4
@@ -95,6 +96,7 @@ static int simple_switch_handle(const cJSON *cmd_json, const cJSON *rsp_json, vo
 
     return SS_ENTRY_OK;
 }
+#endif /* CONFIG_NODE_USING_RELAY */
 
 /***
  * @description : init simple switch
@@ -102,10 +104,10 @@ static int simple_switch_handle(const cJSON *cmd_json, const cJSON *rsp_json, vo
  */
 esp_err_t register_simple_switch(void)
 {
+#ifdef CONFIG_NODE_USING_RELAY
     for (int i = 0; i < SS_MAX_RELAY_NUM; i++) {
         g_ss_gpio_tab[i] = -1;
     }
-#ifdef CONFIG_NODE_USING_RELAY
     // init all gpio for simple switch
     uint64_t pin_mask = 0;
     #ifdef CONFIG_USING_RELAY_1

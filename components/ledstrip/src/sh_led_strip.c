@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-24 23:05:20
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-10-02 22:22:03
+ * @LastEditTime: 2023-10-04 22:33:37
  * @FilePath    : /shellhomenode/components/ledstrip/src/sh_led_strip.c
  * @Description :
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -16,6 +16,7 @@
 #include "led_strip.h"
 #include "sh_led_strip.h"
 
+#ifdef CONFIG_NODE_USING_LED_STRIP
 /**
  * @brief sin() function from 0 to 2π, in total 255 values rounded up，maximum 255，minimum 0
  *
@@ -74,13 +75,11 @@ LED_Strip_Stru g_led_strip;
  */
 static esp_err_t all_set_pixel(uint32_t red, uint32_t green, uint32_t blue)
 {
-#ifdef CONFIG_NODE_USING_LED_STRIP
     for (int i = 0; i < CONFIG_LED_NUM; i++) {
         ESP_ERROR_CHECK(led_strip_set_pixel(g_led_strip.led_strip, i, red, green, blue));
     }
     /* Refresh the strip to send data */
     ESP_ERROR_CHECK(led_strip_refresh(g_led_strip.led_strip));
-#endif /* CONFIG_NODE_USING_LED_STRIP */
     ESP_LOGI(LS_TAG, "LED strip set RGB %ld,%ld,%ld", red, green, blue);
     return ESP_OK;
 }
@@ -92,7 +91,6 @@ static esp_err_t all_clear(void)
 
 static void marquee_cb(void *args)
 {
-#ifdef CONFIG_NODE_USING_LED_STRIP
 	uint8_t ir, ib;
     ir = (uint8_t)(g_led_strip.count + 85);
     ib = (uint8_t)(g_led_strip.count + 170);
@@ -107,12 +105,10 @@ static void marquee_cb(void *args)
 
     // refresh
     ESP_ERROR_CHECK(led_strip_refresh(g_led_strip.led_strip));
-#endif /* CONFIG_NODE_USING_LED_STRIP */
 }
 
 static void breath_cb(void *args)
 {
-#ifdef CONFIG_NODE_USING_LED_STRIP
 	uint8_t ir, ib;
     ir = (uint8_t)(g_led_strip.count + 85);
     ib = (uint8_t)(g_led_strip.count + 170);
@@ -127,7 +123,6 @@ static void breath_cb(void *args)
 
     // refresh
     ESP_ERROR_CHECK(led_strip_refresh(g_led_strip.led_strip));
-#endif /* CONFIG_NODE_USING_LED_STRIP */
 }
 
 static esp_err_t stop_running(void)
@@ -303,6 +298,7 @@ static int breath_handle(const cJSON *cmd_json, const cJSON *rsp_json, void *arg
     ESP_LOGI(LS_TAG, "LED strip breath start");
     return start_running(breath_cb, (uint64_t)json_period->valueint);
 }
+#endif /* CONFIG_NODE_USING_LED_STRIP */
 
 /***
  * @description : init LED Strip

@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-10-02 16:17:17
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-10-03 20:03:48
+ * @LastEditTime: 2023-10-04 22:30:36
  * @FilePath    : /shellhomenode/components/ambient/src/sensor_ambient.c
  * @Description : ambient light sensor
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -18,6 +18,11 @@
 #include "sensor_ambient.h"
 #include "shn_network.h"
 
+#ifdef CONFIG_NODE_AMBIENT_LIGHT
+static const char *SAL_TAG = "ambient";
+
+#define FILTER_WINDOW       (1<<2)
+
 #ifdef CONFIG_AMBIENT_TEMT_6000
 #include "ambient_temt6000.h"
 #elif CONFIG_AMBIENT_VEML_7700
@@ -25,10 +30,6 @@
 #else
 #error "unknown amblient light sensor type"
 #endif
-
-static const char *SAL_TAG = "ambient";
-
-#define FILTER_WINDOW       (1<<2)
 
 typedef struct {
     Sensor_Ambient_Lisght    *sensor;       // sensor
@@ -82,12 +83,15 @@ static int ambient_sub_handle(const cJSON *cmd_json, const cJSON *rsp_json, void
     return SAL_ENTRY_NOT_IMPLEMENTED;
 }
 
+#endif /* CONFIG_NODE_AMBIENT_LIGHT */
+
 /***
  * @description : regitster entry for sensor
  * @return       {*}
  */
 esp_err_t register_sensor_ambient(void)
 {
+#ifdef CONFIG_NODE_AMBIENT_LIGHT
     memset(&g_sensor_cb, 0, sizeof(Sensor_CB));
 #ifdef CONFIG_AMBIENT_TEMT_6000
     g_sensor_cb.sensor = temt6000_instance();
@@ -118,5 +122,6 @@ esp_err_t register_sensor_ambient(void)
     esp_timer_start_periodic(g_sensor_cb.timer_handle,
                     CONFIG_NODE_AMBIENT_LIGHT_READ_TIMER * 1000000U);
 
+#endif /* CONFIG_NODE_AMBIENT_LIGHT */
     return ESP_OK;
 }
