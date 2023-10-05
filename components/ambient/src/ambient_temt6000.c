@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-10-02 16:12:58
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-10-03 20:57:36
+ * @LastEditTime: 2023-10-05 16:31:09
  * @FilePath    : /shellhomenode/components/ambient/src/ambient_temt6000.c
  * @Description : ambient light sensor TEMT6000
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -91,10 +91,10 @@ static esp_err_t sensor_init(void * arg)
     return ESP_OK;
 }
 
+#ifdef CONFIG_AMBIENT_TEMT_6000
 // get adc voltage in mV
 static void adc_get_voltage(int *out_voltage)
 {
-#ifdef CONFIG_AMBIENT_TEMT_6000
     static uint32_t sample_index = 0;
     static int filter_buf[NO_OF_SAMPLES] = {0};
     int raw;
@@ -121,8 +121,8 @@ static void adc_get_voltage(int *out_voltage)
 
     /**< Convert adc_reading to voltage in mV */
     ESP_ERROR_CHECK(adc_cali_raw_to_voltage(g_adc1_cali_handle, (int)sum, (int *)out_voltage));
-#endif /* CONFIG_AMBIENT_TEMT_6000 */
 }
+#endif /* CONFIG_AMBIENT_TEMT_6000 */
 
 // function to read lux data
 static esp_err_t sensor_read(float *o_lux)

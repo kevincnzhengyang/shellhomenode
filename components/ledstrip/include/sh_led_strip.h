@@ -14,6 +14,11 @@
 extern "C" {
 #endif
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/timers.h"
+#include "esp_timer.h"
+
 #include "shn_network.h"
 
 
@@ -31,6 +36,13 @@ typedef enum {
     LS_ENTRY_RESULT_ERROR,
 } LEDStrip_Err_Enum;
 
+//
+typedef struct {
+    led_strip_handle_t     led_strip;       // LED Strip
+    esp_timer_handle_t  timer_handle;       // timer handler
+    bool                     running;       // marquee or breath running flag
+    uint8_t                    count;       // count for marquee or breath
+} LED_Strip_Stru;
 
 /***
  * @description : init LED Strip

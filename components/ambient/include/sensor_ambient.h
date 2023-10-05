@@ -16,26 +16,14 @@ extern "C" {
 
 #include <stdio.h>
 #include <string.h>
+#include <string.h>
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/timers.h"
+#include "esp_timer.h"
 #include "esp_err.h"
 #include "esp_log.h"
-
-// #ifdef CONFIG_IDF_TARGET_ESP32S2
-
-// #define SENSOR_AMBIENT_LIGHT_ADC_CHANNEL 3
-
-// #elif defined CONFIG_IDF_TARGET_ESP32 /* CONFIG_IDF_TARGET_ESP32S2 */
-
-// #define SENSOR_AMBIENT_LIGHT_ADC_CHANNEL 0
-
-// #elif defined CONFIG_IDF_TARGET_ESP32C3 /* CONFIG_IDF_TARGET_ESP32 */
-
-// #define SENSOR_AMBIENT_LIGHT_ADC_CHANNEL 1
-
-// #else
-
-// #error "unknow chip type"
-// #endif /* CONFIG_IDF_TARGET_ESP32 */
 
 typedef enum {
     SAL_ENTRY_OK,
@@ -56,6 +44,15 @@ typedef struct
     sal_init        init_handle;
     sal_read        read_handle;
 } Sensor_Ambient_Lisght;
+
+#define FILTER_WINDOW       (1<<2)
+
+typedef struct {
+    Sensor_Ambient_Lisght    *sensor;       // sensor
+    esp_timer_handle_t  timer_handle;       // timer handler
+    float        buff[FILTER_WINDOW];       // buffer from reading
+    uint32_t                   index;       // last index for buffer
+} Sensor_CB;
 
 /***
  * @description : regitster entry for sensor

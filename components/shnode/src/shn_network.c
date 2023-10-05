@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-08 18:40:25
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-10-02 22:20:48
+ * @LastEditTime: 2023-10-05 16:56:47
  * @FilePath    : /shellhomenode/components/shnode/src/shn_network.c
  * @Description :
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -89,6 +89,8 @@ typedef struct
 typedef struct {
     char                  *entry;       // service entry
     shn_cmd_handle       handler;       // handler for command
+    shn_cmd_handle          hook;       // hook for command
+    void                    *arg;       // user defined argument for handler and hook
 } shn_sap_entry;
 
 typedef struct
@@ -294,14 +296,14 @@ static esp_err_t handle_forget(int index,
     return ESP_OK;
 }
 
-static shn_cmd_handle get_sap_entry(char *entry)
+static shn_sap_entry* get_sap_entry(const char *entry)
 {
     if (NULL == entry || 0 == g_node_proto.entry_num) return NULL;
 
     for (int i = 0; i < g_node_proto.entry_num; i++) {
         if (0 == strncmp(g_node_proto.entry_table[i].entry,
                             entry, strlen(entry))) {
-            return g_node_proto.entry_table[i].handler;
+            return &g_node_proto.entry_table[i];
         }
     }
     return NULL;
@@ -332,7 +334,7 @@ static esp_err_t handle_request(int index,
     json_params = cJSON_GetObjectItemCaseSensitive(json_cmd_body, "params");
 
     // find entry and handle the request
-    shn_cmd_handle entry = get_sap_entry(json_entry->valuestring);
+    shn_sap_entry *entry = get_sap_entry(json_entry->valuestring);
     if (NULL == entry) {
         ESP_LOGE(NET_TAG, "unknown entry [%s]", json_entry->valuestring);
         respond_cmd(json_rsp, CODE_UNKNOWN_ENTRY);
@@ -341,13 +343,20 @@ static esp_err_t handle_request(int index,
     ESP_LOGI(NET_TAG, "entry [%s] processing", json_entry->valuestring);
 
     // call handler and respond
-    int sap_res = entry(json_params, json_rsp, g_node_proto.handle_arg);
-    if (0 != sap_res) {
+    int sap_res = entry->handler(json_params, json_rsp, entry->arg);
+    if (ESP_OK != sap_res) {
         sap_res += CODE_ENTRY_ERR_BASE;
     }
     if (ESP_OK != respond_cmd(json_rsp, sap_res)) {
         ESP_LOGE(NET_TAG, "Failed to response request");
         return ESP_FAIL;
+    }
+
+    // call hook if existed
+    if (NULL == entry->hook) return ESP_OK;
+    ESP_LOGI(NET_TAG, "entry [%s] hook calling", json_entry->valuestring);
+    if (ESP_OK != entry->hook(json_params, json_rsp, entry->arg)) {
+        ESP_LOGW(NET_TAG, "entry [%s] hook failed", json_entry->valuestring);
     }
     return ESP_OK;
 }
@@ -688,13 +697,17 @@ esp_err_t init_shn_proto(void *arg)
     return ESP_OK;
 }
 
+
 /***
  * @description : register an entry into protocol
  * @param        {char} *entry: name of entry
- * @param        {shn_cmd_handle} *handler: pointer to handler
+ * @param        {shn_cmd_handle} handler: pointer to handler
+ * @param        {shn_cmd_handle} hook: pointer to hook
+ * @param        {void} *arg: pointer to user defined argument
  * @return       {*}
  */
-esp_err_t register_entry(const char *entry, shn_cmd_handle handler)
+esp_err_t register_entry(const char *entry, shn_cmd_handle handler,
+                        shn_cmd_handle hook, void *arg)
 {
     if (NULL == entry || NULL == handler) return ESP_FAIL;
 
@@ -706,9 +719,33 @@ esp_err_t register_entry(const char *entry, shn_cmd_handle handler)
         if (NULL != sap_entry->entry) free(sap_entry->entry);
         sap_entry->entry = strdup(entry);
         sap_entry->handler = handler;
+        sap_entry->hook = hook;
+        sap_entry->arg = arg;
         ESP_LOGI(NET_TAG, "entry %s @ %d", entry, g_node_proto.entry_num);
         g_node_proto.entry_num++;
     }
+    return ESP_OK;
+}
+
+/***
+ * @description : add a hook for an entry
+ * @param        {char} *entry: name of entry
+ * @param        {shn_cmd_handle} hook: pointer to hook
+ * @return       {*}
+ */
+esp_err_t add_entry_hook(const char *entry, shn_cmd_handle hook)
+{
+    if (NULL == entry || NULL == hook) return ESP_FAIL;
+
+    // find entry and replace the hook
+    shn_sap_entry* sap_entry = get_sap_entry(entry);
+    if (NULL == sap_entry) {
+        ESP_LOGE(NET_TAG, "unknown entry [%s]", entry);
+        return ESP_FAIL;
+    }
+    ESP_LOGI(NET_TAG, "entry [%s] add hook", entry);
+    sap_entry->hook = hook;
+
     return ESP_OK;
 }
 

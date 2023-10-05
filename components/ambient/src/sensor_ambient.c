@@ -2,26 +2,17 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-10-02 16:17:17
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-10-04 22:30:36
+ * @LastEditTime: 2023-10-05 16:54:25
  * @FilePath    : /shellhomenode/components/ambient/src/sensor_ambient.c
  * @Description : ambient light sensor
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
  */
-#include <string.h>
-
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/timers.h"
-#include "esp_timer.h"
-#include <esp_log.h>
 
 #include "sensor_ambient.h"
 #include "shn_network.h"
 
 #ifdef CONFIG_NODE_AMBIENT_LIGHT
 static const char *SAL_TAG = "ambient";
-
-#define FILTER_WINDOW       (1<<2)
 
 #ifdef CONFIG_AMBIENT_TEMT_6000
 #include "ambient_temt6000.h"
@@ -30,13 +21,6 @@ static const char *SAL_TAG = "ambient";
 #else
 #error "unknown amblient light sensor type"
 #endif
-
-typedef struct {
-    Sensor_Ambient_Lisght    *sensor;       // sensor
-    esp_timer_handle_t  timer_handle;       // timer handler
-    float        buff[FILTER_WINDOW];       // buffer from reading
-    uint32_t                   index;       // last index for buffer
-} Sensor_CB;
 
 static Sensor_CB g_sensor_cb;
 
@@ -107,8 +91,8 @@ esp_err_t register_sensor_ambient(void)
     }
 
     ESP_ERROR_CHECK(g_sensor_cb.sensor->init_handle(NULL));
-    ESP_ERROR_CHECK(register_entry("sal_get", ambient_get_handle));
-    ESP_ERROR_CHECK(register_entry("sal_subscribe", ambient_sub_handle));
+    ESP_ERROR_CHECK(register_entry("sal_get", ambient_get_handle, &g_sensor_cb));
+    ESP_ERROR_CHECK(register_entry("sal_subscribe", ambient_sub_handle, &g_sensor_cb));
 
 
     esp_timer_create_args_t sal_timer = {

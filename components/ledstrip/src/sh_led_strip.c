@@ -2,19 +2,16 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-24 23:05:20
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-10-04 22:33:37
+ * @LastEditTime: 2023-10-05 17:14:28
  * @FilePath    : /shellhomenode/components/ledstrip/src/sh_led_strip.c
  * @Description :
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
  */
 
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/timers.h"
-#include "esp_timer.h"
-
 #include "led_strip.h"
+
 #include "sh_led_strip.h"
+#include "sh_led_strip_inc.h"
 
 #ifdef CONFIG_NODE_USING_LED_STRIP
 /**
@@ -51,14 +48,7 @@ uint8_t  const SinValue[256]={	128,   131,   134,   137,   140,   143,   147,   
 
 static const char *LS_TAG = "led_strip";
 
-typedef struct {
-    led_strip_handle_t     led_strip;       // LED Strip
-    esp_timer_handle_t  timer_handle;       // timer handler
-    bool                     running;       // marquee or breath running flag
-    uint8_t                    count;       // count for marquee or breath
-} LED_Strip_Stru;
-
-LED_Strip_Stru g_led_strip;
+static LED_Strip_Stru g_led_strip;
 
 
 /**
@@ -73,7 +63,7 @@ LED_Strip_Stru g_led_strip;
  *      - ESP_ERR_INVALID_ARG: Set RGB for a specific pixel failed because of invalid parameters
  *      - ESP_FAIL: Set RGB for a specific pixel failed because other error occurred
  */
-static esp_err_t all_set_pixel(uint32_t red, uint32_t green, uint32_t blue)
+esp_err_t all_set_pixel(uint32_t red, uint32_t green, uint32_t blue)
 {
     for (int i = 0; i < CONFIG_LED_NUM; i++) {
         ESP_ERROR_CHECK(led_strip_set_pixel(g_led_strip.led_strip, i, red, green, blue));
@@ -84,12 +74,21 @@ static esp_err_t all_set_pixel(uint32_t red, uint32_t green, uint32_t blue)
     return ESP_OK;
 }
 
-static esp_err_t all_clear(void)
+/**
+ * @description : Clear LED Strip
+ * @return       {*}
+ */
+esp_err_t all_clear(void)
 {
     return led_strip_clear(g_led_strip.led_strip);
 }
 
-static void marquee_cb(void *args)
+/**
+ * @description : marquee mode
+ * @param        {void} *args
+ * @return       {*}
+ */
+void marquee_cb(void *args)
 {
 	uint8_t ir, ib;
     ir = (uint8_t)(g_led_strip.count + 85);
@@ -107,7 +106,12 @@ static void marquee_cb(void *args)
     ESP_ERROR_CHECK(led_strip_refresh(g_led_strip.led_strip));
 }
 
-static void breath_cb(void *args)
+/**
+ * @description : breath mod
+ * @param        {void} *args
+ * @return       {*}
+ */
+void breath_cb(void *args)
 {
 	uint8_t ir, ib;
     ir = (uint8_t)(g_led_strip.count + 85);
@@ -125,7 +129,11 @@ static void breath_cb(void *args)
     ESP_ERROR_CHECK(led_strip_refresh(g_led_strip.led_strip));
 }
 
-static esp_err_t stop_running(void)
+/**
+ * @description : stop running
+ * @return       {*}
+ */
+esp_err_t stop_running(void)
 {
     if (true == g_led_strip.running) {
         esp_timer_stop(g_led_strip.timer_handle);
@@ -137,7 +145,13 @@ static esp_err_t stop_running(void)
     return ESP_OK;
 }
 
-static esp_err_t start_running(esp_timer_cb_t cb, uint64_t periodic)
+/**
+ * @description : start running
+ * @param        {esp_timer_cb_t} cb - mod callback
+ * @param        {uint64_t} periodic - period in ms
+ * @return       {*}
+ */
+esp_err_t start_running(esp_timer_cb_t cb, uint64_t periodic)
 {
     esp_timer_create_args_t strip_timer = {
         .arg = NULL,
@@ -332,9 +346,9 @@ esp_err_t register_led_strip(void)
                                              &g_led_strip.led_strip));
     ESP_LOGI(LS_TAG, "Created LED strip object with RMT backend");
 
-    ESP_ERROR_CHECK(register_entry("dimmable_light", dimmable_handle));
-    ESP_ERROR_CHECK(register_entry("marquee", marquee_handle));
-    ESP_ERROR_CHECK(register_entry("breathing_light", breath_handle));
+    ESP_ERROR_CHECK(register_entry("dimmable_light", dimmable_handle, &g_led_strip));
+    ESP_ERROR_CHECK(register_entry("marquee", marquee_handle, &g_led_strip));
+    ESP_ERROR_CHECK(register_entry("breathing_light", breath_handle, &g_led_strip));
 #endif /* CONFIG_NODE_USING_LED_STRIP */
     return ESP_OK;
 }

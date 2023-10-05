@@ -45,9 +45,20 @@ esp_err_t init_shn_proto(void *arg);
  * @description : register an entry into protocol
  * @param        {char} *entry: name of entry
  * @param        {shn_cmd_handle} handler: pointer to handler
+ * @param        {shn_cmd_handle} hook: pointer to hook
+ * @param        {void} *arg: pointer to user defined argument
  * @return       {*}
  */
-esp_err_t register_entry(const char *entry, shn_cmd_handle handler);
+esp_err_t register_entry(const char *entry, shn_cmd_handle handler,
+                        shn_cmd_handle hook, void *arg);
+
+/***
+ * @description : add a hook for an entry
+ * @param        {char} *entry: name of entry
+ * @param        {shn_cmd_handle} hook: pointer to hook
+ * @return       {*}
+ */
+esp_err_t add_entry_hook(const char *entry, shn_cmd_handle hook);
 
 /***
  * @description : launch ShellHome Node protocol
