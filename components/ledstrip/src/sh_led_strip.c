@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-24 23:05:20
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-10-05 17:14:28
+ * @LastEditTime: 2023-10-05 18:50:02
  * @FilePath    : /shellhomenode/components/ledstrip/src/sh_led_strip.c
  * @Description :
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -346,9 +346,9 @@ esp_err_t register_led_strip(void)
                                              &g_led_strip.led_strip));
     ESP_LOGI(LS_TAG, "Created LED strip object with RMT backend");
 
-    ESP_ERROR_CHECK(register_entry("dimmable_light", dimmable_handle, &g_led_strip));
-    ESP_ERROR_CHECK(register_entry("marquee", marquee_handle, &g_led_strip));
-    ESP_ERROR_CHECK(register_entry("breathing_light", breath_handle, &g_led_strip));
+    ESP_ERROR_CHECK(register_entry("dimmable_light", dimmable_handle, NULL, &g_led_strip));
+    ESP_ERROR_CHECK(register_entry("marquee", marquee_handle, NULL, &g_led_strip));
+    ESP_ERROR_CHECK(register_entry("breathing_light", breath_handle, NULL, &g_led_strip));
 #endif /* CONFIG_NODE_USING_LED_STRIP */
     return ESP_OK;
 }

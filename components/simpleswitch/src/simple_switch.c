@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-20 22:05:13
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-10-05 16:25:51
+ * @LastEditTime: 2023-10-05 18:49:12
  * @FilePath    : /shellhomenode/components/simpleswitch/src/simple_switch.c
  * @Description : Simple Switch
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -140,7 +140,7 @@ esp_err_t register_simple_switch(void)
     };
     gpio_config(&io_conf);       //configure GPIO
 
-    return register_entry("switch", simple_switch_handle, NULL);
+    return register_entry("switch", simple_switch_handle, NULL, NULL);
 #else
     return ESP_OK;
 #endif /* CONFIG_NODE_USING_RELAY */

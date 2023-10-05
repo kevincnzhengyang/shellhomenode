@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-10-02 16:17:17
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-10-05 16:54:25
+ * @LastEditTime: 2023-10-05 18:48:09
  * @FilePath    : /shellhomenode/components/ambient/src/sensor_ambient.c
  * @Description : ambient light sensor
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -91,8 +91,8 @@ esp_err_t register_sensor_ambient(void)
     }
 
     ESP_ERROR_CHECK(g_sensor_cb.sensor->init_handle(NULL));
-    ESP_ERROR_CHECK(register_entry("sal_get", ambient_get_handle, &g_sensor_cb));
-    ESP_ERROR_CHECK(register_entry("sal_subscribe", ambient_sub_handle, &g_sensor_cb));
+    ESP_ERROR_CHECK(register_entry("sal_get", ambient_get_handle, NULL, &g_sensor_cb));
+    ESP_ERROR_CHECK(register_entry("sal_subscribe", ambient_sub_handle, NULL, &g_sensor_cb));
 
 
     esp_timer_create_args_t sal_timer = {

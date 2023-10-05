@@ -20,7 +20,7 @@ extern "C" {
 #include "esp_timer.h"
 
 #include "shn_network.h"
-
+#include "led_strip.h"
 
 typedef enum {
     LS_ENTRY_OK,
