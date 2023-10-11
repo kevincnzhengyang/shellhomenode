@@ -67,6 +67,13 @@ esp_err_t stop_running(LED_Strip_Stru *strip);
  * @return       {*}
  */
 esp_err_t start_running(LED_Strip_Stru *strip, esp_timer_cb_t cb, uint64_t periodic);
+
+/***
+ * @description : get pointer of LED_Strip_Stru by index
+ * @param        {int} index
+ * @return       {LED_Strip_Stru*}
+ */
+LED_Strip_Stru *get_led_strip_by_index(int index);
 #ifdef __cplusplus
 }
 #endif

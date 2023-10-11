@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-24 23:05:20
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-10-11 21:11:05
+ * @LastEditTime: 2023-10-11 21:41:15
  * @FilePath    : /shellhomenode/components/ledstrip/src/sh_led_strip.c
  * @Description :
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -178,6 +178,24 @@ esp_err_t start_running(LED_Strip_Stru *strip, esp_timer_cb_t cb, uint64_t perio
     strip->running = true;
     ESP_LOGI(LS_TAG, "LED strip running start");
     return ESP_OK;
+}
+
+/***
+ * @description : get pointer of LED_Strip_Stru by index
+ * @param        {int} index
+ * @return       {LED_Strip_Stru*}
+ */
+LED_Strip_Stru *get_led_strip_by_index(int index)
+{
+    if (0 > index || LS_MAX_STRIP_NUM <= index) {
+        ESP_LOGE(LS_TAG, "invalid index [%d]", index);
+        return NULL;
+    }
+    if (!g_led_strips[index].configed) {
+        ESP_LOGE(LS_TAG, "not configed index [%d]", index);
+        return NULL;
+    }
+    return &g_led_strips[index];
 }
 
 static int dimmable_handle(const cJSON *cmd_json, const cJSON *rsp_json, void *arg)
