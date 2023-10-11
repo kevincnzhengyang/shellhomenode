@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-24 23:05:20
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-10-05 18:50:02
+ * @LastEditTime: 2023-10-11 21:11:05
  * @FilePath    : /shellhomenode/components/ledstrip/src/sh_led_strip.c
  * @Description :
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -48,7 +48,9 @@ uint8_t  const SinValue[256]={	128,   131,   134,   137,   140,   143,   147,   
 
 static const char *LS_TAG = "led_strip";
 
-static LED_Strip_Stru g_led_strip;
+#define LS_MAX_STRIP_NUM        4
+
+static LED_Strip_Stru g_led_strips[LS_MAX_STRIP_NUM];
 
 
 /**
@@ -63,24 +65,26 @@ static LED_Strip_Stru g_led_strip;
  *      - ESP_ERR_INVALID_ARG: Set RGB for a specific pixel failed because of invalid parameters
  *      - ESP_FAIL: Set RGB for a specific pixel failed because other error occurred
  */
-esp_err_t all_set_pixel(uint32_t red, uint32_t green, uint32_t blue)
+esp_err_t all_set_pixel(LED_Strip_Stru *strip, uint32_t red, uint32_t green, uint32_t blue)
 {
-    for (int i = 0; i < CONFIG_LED_NUM; i++) {
-        ESP_ERROR_CHECK(led_strip_set_pixel(g_led_strip.led_strip, i, red, green, blue));
+    if (NULL == strip || !strip->configed) return ESP_FAIL;
+    for (int i = 0; i < strip->led_num; i++) {
+        ESP_ERROR_CHECK(led_strip_set_pixel(strip->led_strip, i, red, green, blue));
     }
     /* Refresh the strip to send data */
-    ESP_ERROR_CHECK(led_strip_refresh(g_led_strip.led_strip));
+    ESP_ERROR_CHECK(led_strip_refresh(strip->led_strip));
     ESP_LOGI(LS_TAG, "LED strip set RGB %ld,%ld,%ld", red, green, blue);
     return ESP_OK;
 }
 
 /**
  * @description : Clear LED Strip
- * @return       {*}
+ * @return       {LED_Strip_Stru  *}strip - pointer to LED_Strip_Stru
  */
-esp_err_t all_clear(void)
+esp_err_t all_clear(LED_Strip_Stru *strip)
 {
-    return led_strip_clear(g_led_strip.led_strip);
+    if (NULL == strip || !strip->configed) return ESP_FAIL;
+    return led_strip_clear(strip->led_strip);
 }
 
 /**
@@ -90,20 +94,21 @@ esp_err_t all_clear(void)
  */
 void marquee_cb(void *args)
 {
+    LED_Strip_Stru *strip = (LED_Strip_Stru *)args;
 	uint8_t ir, ib;
-    ir = (uint8_t)(g_led_strip.count + 85);
-    ib = (uint8_t)(g_led_strip.count + 170);
-    for (int j = 0; j < CONFIG_LED_NUM; j ++) {
+    ir = (uint8_t)(strip->count + 85);
+    ib = (uint8_t)(strip->count + 170);
+    for (int j = 0; j < strip->led_num; j ++) {
         // set RGB
-        ESP_ERROR_CHECK(led_strip_set_pixel(g_led_strip.led_strip, j,
+        ESP_ERROR_CHECK(led_strip_set_pixel(strip->led_strip, j,
                             (uint32_t)SinValue[(ir + 10 * j) % 256],      // red
-                            (uint32_t)SinValue[(g_led_strip.count + 10 * j) % 256],  // green
+                            (uint32_t)SinValue[(strip->count + 10 * j) % 256],  // green
                             (uint32_t)SinValue[(ib + 10 * j) % 256]));    // blue
     }
-    g_led_strip.count++;
+    strip->count++;
 
     // refresh
-    ESP_ERROR_CHECK(led_strip_refresh(g_led_strip.led_strip));
+    ESP_ERROR_CHECK(led_strip_refresh(strip->led_strip));
 }
 
 /**
@@ -113,60 +118,64 @@ void marquee_cb(void *args)
  */
 void breath_cb(void *args)
 {
+    LED_Strip_Stru *strip = (LED_Strip_Stru *)args;
 	uint8_t ir, ib;
-    ir = (uint8_t)(g_led_strip.count + 85);
-    ib = (uint8_t)(g_led_strip.count + 170);
-    for (int j = 0; j < CONFIG_LED_NUM; j ++) {
+    ir = (uint8_t)(strip->count + 85);
+    ib = (uint8_t)(strip->count + 170);
+    for (int j = 0; j < strip->led_num; j ++) {
         // set RGB
-        ESP_ERROR_CHECK(led_strip_set_pixel(g_led_strip.led_strip, j,
+        ESP_ERROR_CHECK(led_strip_set_pixel(strip->led_strip, j,
                             (uint32_t)SinValue[ir],         // red
-                            (uint32_t)SinValue[g_led_strip.count], // green
+                            (uint32_t)SinValue[strip->count], // green
                             (uint32_t)SinValue[ib]));       // blue
     }
-    g_led_strip.count++;
+    strip->count++;
 
     // refresh
-    ESP_ERROR_CHECK(led_strip_refresh(g_led_strip.led_strip));
+    ESP_ERROR_CHECK(led_strip_refresh(strip->led_strip));
 }
 
 /**
  * @description : stop running
- * @return       {*}
+ * @return       {LED_Strip_Stru *} strip - pointer to LED_Strip_Stru
  */
-esp_err_t stop_running(void)
+esp_err_t stop_running(LED_Strip_Stru *strip)
 {
-    if (true == g_led_strip.running) {
-        esp_timer_stop(g_led_strip.timer_handle);
-        esp_timer_delete(g_led_strip.timer_handle);
-        g_led_strip.running = false;
+    if (NULL == strip || ! strip->configed) return ESP_FAIL;
+    if (true == strip->running) {
+        esp_timer_stop(strip->timer_handle);
+        esp_timer_delete(strip->timer_handle);
+        strip->running = false;
     }
-    all_clear();
+    all_clear(strip);
     ESP_LOGI(LS_TAG, "LED strip running stop");
     return ESP_OK;
 }
 
 /**
  * @description : start running
+ * @return       {LED_Strip_Stru *} strip - pointer to LED_Strip_Stru
  * @param        {esp_timer_cb_t} cb - mod callback
  * @param        {uint64_t} periodic - period in ms
  * @return       {*}
  */
-esp_err_t start_running(esp_timer_cb_t cb, uint64_t periodic)
+esp_err_t start_running(LED_Strip_Stru *strip, esp_timer_cb_t cb, uint64_t periodic)
 {
+    if (NULL == strip || ! strip->configed) return ESP_FAIL;
     esp_timer_create_args_t strip_timer = {
-        .arg = NULL,
+        .arg = (void *)strip,
         .callback = cb,
         .dispatch_method = ESP_TIMER_TASK,
-        .name = "strip_timer"
+        .name = strip->name
     };
 
-    if (true == g_led_strip.running) {
-        stop_running();
+    if (true == strip->running) {
+        stop_running(strip);
     }
 
-    esp_timer_create(&strip_timer, &g_led_strip.timer_handle);
-    esp_timer_start_periodic(g_led_strip.timer_handle, periodic * 1000U);
-    g_led_strip.running = true;
+    esp_timer_create(&strip_timer, &strip->timer_handle);
+    esp_timer_start_periodic(strip->timer_handle, periodic * 1000U);
+    strip->running = true;
     ESP_LOGI(LS_TAG, "LED strip running start");
     return ESP_OK;
 }
@@ -181,10 +190,9 @@ static int dimmable_handle(const cJSON *cmd_json, const cJSON *rsp_json, void *a
         ESP_LOGE(LS_TAG, "JSON failed to get boolean element [on]");
         return LS_ENTRY_MISSING_ON;
     }
-
     // prepare result
     cJSON *json_body = cJSON_AddObjectToObject((cJSON *)rsp_json, "body");
-    if (NULL == cJSON_AddStringToObject(json_body, "entry", "switch")) {
+    if (NULL == cJSON_AddStringToObject(json_body, "entry", "dimmable_light")) {
         ESP_LOGE(LS_TAG, "Failed to encode body [entry]");
         return LS_ENTRY_RESULT_ERROR;
     }
@@ -194,9 +202,28 @@ static int dimmable_handle(const cJSON *cmd_json, const cJSON *rsp_json, void *a
         return LS_ENTRY_RESULT_ERROR;
     }
 
+    // get and check index
+    cJSON *json_index = cJSON_GetObjectItemCaseSensitive(cmd_json, "index");
+    if (!cJSON_IsNumber(json_index)) {
+        ESP_LOGE(LS_TAG, "JSON failed to get integer element [index]");
+        return LS_ENTRY_MISSING_INDEX;
+    }
+    if (cJSON_AddNumberToObject(json_result, "index", json_index->valueint) == NULL) {
+        ESP_LOGE(LS_TAG, "Failed to encode index [%d]", json_index->valueint);
+        return LS_ENTRY_RESULT_ERROR;
+    }
+    if (0 > json_index->valueint || LS_MAX_STRIP_NUM <= json_index->valueint) {
+        ESP_LOGE(LS_TAG, "invalid index [%d]", json_index->valueint);
+        return LS_ENTRY_INVALID_INDEX;
+    }
+    if (!g_led_strips[json_index->valueint].configed) {
+        ESP_LOGE(LS_TAG, "not configed index [%d]", json_index->valueint);
+        return LS_ENTRY_NOT_CONFIGED;
+    }
+
     if (cJSON_IsFalse(json_on)) {
         // LED off
-        return stop_running();
+        return stop_running(&g_led_strips[json_index->valueint]);
     }
 
     // get RGB value and set
@@ -228,7 +255,8 @@ static int dimmable_handle(const cJSON *cmd_json, const cJSON *rsp_json, void *a
         return LS_ENTRY_INVALID_B;
     }
 
-    return all_set_pixel((uint32_t)json_r->valueint,
+    return all_set_pixel(&g_led_strips[json_index->valueint],
+                         (uint32_t)json_r->valueint,
                          (uint32_t)json_g->valueint,
                          (uint32_t)json_b->valueint);
 }
@@ -256,9 +284,28 @@ static int marquee_handle(const cJSON *cmd_json, const cJSON *rsp_json, void *ar
         return LS_ENTRY_RESULT_ERROR;
     }
 
+    // get and check index
+    cJSON *json_index = cJSON_GetObjectItemCaseSensitive(cmd_json, "index");
+    if (!cJSON_IsNumber(json_index)) {
+        ESP_LOGE(LS_TAG, "JSON failed to get integer element [index]");
+        return LS_ENTRY_MISSING_INDEX;
+    }
+    if (cJSON_AddNumberToObject(json_result, "index", json_index->valueint) == NULL) {
+        ESP_LOGE(LS_TAG, "Failed to encode index [%d]", json_index->valueint);
+        return LS_ENTRY_RESULT_ERROR;
+    }
+    if (0 > json_index->valueint || LS_MAX_STRIP_NUM <= json_index->valueint) {
+        ESP_LOGE(LS_TAG, "invalid index [%d]", json_index->valueint);
+        return LS_ENTRY_INVALID_INDEX;
+    }
+    if (!g_led_strips[json_index->valueint].configed) {
+        ESP_LOGE(LS_TAG, "not configed index [%d]", json_index->valueint);
+        return LS_ENTRY_NOT_CONFIGED;
+    }
+
     if (cJSON_IsFalse(json_on)) {
         // LED off
-        return stop_running();
+        return stop_running(&g_led_strips[json_index->valueint]);
     }
 
     // get RGB value and set
@@ -270,7 +317,8 @@ static int marquee_handle(const cJSON *cmd_json, const cJSON *rsp_json, void *ar
 
     // start marquee
     ESP_LOGI(LS_TAG, "LED strip marquee start");
-    return start_running(marquee_cb, (uint64_t)json_period->valueint);
+    return start_running(&g_led_strips[json_index->valueint], marquee_cb,
+                         (uint64_t)json_period->valueint);
 }
 
 static int breath_handle(const cJSON *cmd_json, const cJSON *rsp_json, void *arg)
@@ -296,9 +344,28 @@ static int breath_handle(const cJSON *cmd_json, const cJSON *rsp_json, void *arg
         return LS_ENTRY_RESULT_ERROR;
     }
 
+    // get and check index
+    cJSON *json_index = cJSON_GetObjectItemCaseSensitive(cmd_json, "index");
+    if (!cJSON_IsNumber(json_index)) {
+        ESP_LOGE(LS_TAG, "JSON failed to get integer element [index]");
+        return LS_ENTRY_MISSING_INDEX;
+    }
+    if (cJSON_AddNumberToObject(json_result, "index", json_index->valueint) == NULL) {
+        ESP_LOGE(LS_TAG, "Failed to encode index [%d]", json_index->valueint);
+        return LS_ENTRY_RESULT_ERROR;
+    }
+    if (0 > json_index->valueint || LS_MAX_STRIP_NUM <= json_index->valueint) {
+        ESP_LOGE(LS_TAG, "invalid index [%d]", json_index->valueint);
+        return LS_ENTRY_INVALID_INDEX;
+    }
+    if (!g_led_strips[json_index->valueint].configed) {
+        ESP_LOGE(LS_TAG, "not configed index [%d]", json_index->valueint);
+        return LS_ENTRY_NOT_CONFIGED;
+    }
+
     if (cJSON_IsFalse(json_on)) {
         // LED off
-        return stop_running();
+        return stop_running(&g_led_strips[json_index->valueint]);
     }
 
     // get RGB value and set
@@ -310,7 +377,8 @@ static int breath_handle(const cJSON *cmd_json, const cJSON *rsp_json, void *arg
 
     // start breath
     ESP_LOGI(LS_TAG, "LED strip breath start");
-    return start_running(breath_cb, (uint64_t)json_period->valueint);
+    return start_running(&g_led_strips[json_index->valueint],
+                         breath_cb, (uint64_t)json_period->valueint);
 }
 #endif /* CONFIG_NODE_USING_LED_STRIP */
 
@@ -321,34 +389,109 @@ static int breath_handle(const cJSON *cmd_json, const cJSON *rsp_json, void *arg
 esp_err_t register_led_strip(void)
 {
 #ifdef CONFIG_NODE_USING_LED_STRIP
+    // init CB
+    memset(g_led_strips, 0, sizeof(g_led_strips));
+#ifdef CONFIG_USING_STRIP_1
+    g_led_strips[0].configed = true;
+    g_led_strips[0].running = false;
+    g_led_strips[0].name = strdup("strip 1");
+     g_led_strips[0].led_num = CONFIG_STRIP1_LED_NUM;
     // LED strip general initialization
-    led_strip_config_t strip_config = {
-        .strip_gpio_num = CONFIG_LED_STRIP_GPIO_NUM,    // The GPIO connected to the LED strip's data line
-        .max_leds = CONFIG_LED_NUM,                     // The number of LEDs in the strip,
+    led_strip_config_t strip_config1 = {
+        .strip_gpio_num = CONFIG_STRIP1_GPIO_NUM,       // The GPIO connected to the LED strip's data line
+        .max_leds = CONFIG_STRIP1_LED_NUM,              // The number of LEDs in the strip,
         .led_pixel_format = LED_PIXEL_FORMAT_GRB,       // Pixel format of your LED strip
         .led_model = LED_MODEL_WS2812,                  // LED strip model
         .flags.invert_out = false,                      // whether to invert the output signal
     };
 
     // LED strip backend configuration: RMT
-    led_strip_rmt_config_t rmt_config = {
+    led_strip_rmt_config_t rmt_config1 = {
         .clk_src = RMT_CLK_SRC_DEFAULT,                 // different clock source can lead to different power consumption
         .resolution_hz = CONFIG_LED_STRIP_RESOLUTION_HZ, // RMT counter clock frequency
         .flags.with_dma = false,               // DMA feature is available on ESP target like ESP32-S3
     };
+    ESP_ERROR_CHECK(led_strip_new_rmt_device(&strip_config1, &rmt_config1,
+                                             &(g_led_strips[0].led_strip)));
+    ESP_LOGI(LS_TAG, "Created LED strip 1 object with RMT backend");
+#endif /* CONFIG_USING_STRIP_1 */
+#ifdef CONFIG_USING_STRIP_2
+    g_led_strips[1].configed = true;
+    g_led_strips[1].running = false;
+    g_led_strips[1].name = strdup("strip 2");
+     g_led_strips[1].led_num = CONFIG_STRIP2_LED_NUM;
+    // LED strip general initialization
+    led_strip_config_t strip_config2 = {
+        .strip_gpio_num = CONFIG_STRIP2_GPIO_NUM,       // The GPIO connected to the LED strip's data line
+        .max_leds = CONFIG_STRIP2_LED_NUM,              // The number of LEDs in the strip,
+        .led_pixel_format = LED_PIXEL_FORMAT_GRB,       // Pixel format of your LED strip
+        .led_model = LED_MODEL_WS2812,                  // LED strip model
+        .flags.invert_out = false,                      // whether to invert the output signal
+    };
 
-    // init CB
-    memset(&g_led_strip, 0, sizeof(LED_Strip_Stru));
-    g_led_strip.running = false;
+    // LED strip backend configuration: RMT
+    led_strip_rmt_config_t rmt_config2 = {
+        .clk_src = RMT_CLK_SRC_DEFAULT,                 // different clock source can lead to different power consumption
+        .resolution_hz = CONFIG_LED_STRIP_RESOLUTION_HZ, // RMT counter clock frequency
+        .flags.with_dma = false,               // DMA feature is available on ESP target like ESP32-S3
+    };
+    ESP_ERROR_CHECK(led_strip_new_rmt_device(&strip_config2, &rmt_config2,
+                                             &(g_led_strips[1].led_strip)));
+    ESP_LOGI(LS_TAG, "Created LED strip 2 object with RMT backend");
+#endif /* CONFIG_USING_STRIP_2 */
+#ifdef CONFIG_USING_STRIP_3
+    g_led_strips[2].configed = true;
+    g_led_strips[2].running = false;
+    g_led_strips[2].name = strdup("strip 3");
+    g_led_strips[2].led_num = CONFIG_STRIP3_LED_NUM;
+    // LED strip general initialization
+    led_strip_config_t strip_config3 = {
+        .strip_gpio_num = CONFIG_STRIP3_GPIO_NUM,       // The GPIO connected to the LED strip's data line
+        .max_leds = CONFIG_STRIP3_LED_NUM,              // The number of LEDs in the strip,
+        .led_pixel_format = LED_PIXEL_FORMAT_GRB,       // Pixel format of your LED strip
+        .led_model = LED_MODEL_WS2812,                  // LED strip model
+        .flags.invert_out = false,                      // whether to invert the output signal
+    };
+
+    // LED strip backend configuration: RMT
+    led_strip_rmt_config_t rmt_config3 = {
+        .clk_src = RMT_CLK_SRC_DEFAULT,                 // different clock source can lead to different power consumption
+        .resolution_hz = CONFIG_LED_STRIP_RESOLUTION_HZ, // RMT counter clock frequency
+        .flags.with_dma = false,               // DMA feature is available on ESP target like ESP32-S3
+    };
+    ESP_ERROR_CHECK(led_strip_new_rmt_device(&strip_config3, &rmt_config3,
+                                             &(g_led_strips[2].led_strip)));
+    ESP_LOGI(LS_TAG, "Created LED strip 3 object with RMT backend");
+#endif /* CONFIG_USING_STRIP_2 */
+#ifdef CONFIG_USING_STRIP_4
+    g_led_strips[3].configed = true;
+    g_led_strips[3].running = false;
+    g_led_strips[3].name = strdup("strip 4");
+    g_led_strips[3].led_num = CONFIG_STRIP3_LED_NUM;
+    // LED strip general initialization
+    led_strip_config_t strip_config4 = {
+        .strip_gpio_num = CONFIG_STRIP4_GPIO_NUM,       // The GPIO connected to the LED strip's data line
+        .max_leds = CONFIG_STRIP4_LED_NUM,              // The number of LEDs in the strip,
+        .led_pixel_format = LED_PIXEL_FORMAT_GRB,       // Pixel format of your LED strip
+        .led_model = LED_MODEL_WS2812,                  // LED strip model
+        .flags.invert_out = false,                      // whether to invert the output signal
+    };
+
+    // LED strip backend configuration: RMT
+    led_strip_rmt_config_t rmt_config4 = {
+        .clk_src = RMT_CLK_SRC_DEFAULT,                 // different clock source can lead to different power consumption
+        .resolution_hz = CONFIG_LED_STRIP_RESOLUTION_HZ, // RMT counter clock frequency
+        .flags.with_dma = false,               // DMA feature is available on ESP target like ESP32-S3
+    };
+    ESP_ERROR_CHECK(led_strip_new_rmt_device(&strip_config4, &rmt_config4,
+                                             &(g_led_strips[3].led_strip)));
+    ESP_LOGI(LS_TAG, "Created LED strip 4 object with RMT backend");
+#endif /* CONFIG_USING_STRIP_3 */
 
     // LED Strip object handle
-    ESP_ERROR_CHECK(led_strip_new_rmt_device(&strip_config, &rmt_config,
-                                             &g_led_strip.led_strip));
-    ESP_LOGI(LS_TAG, "Created LED strip object with RMT backend");
-
-    ESP_ERROR_CHECK(register_entry("dimmable_light", dimmable_handle, NULL, &g_led_strip));
-    ESP_ERROR_CHECK(register_entry("marquee", marquee_handle, NULL, &g_led_strip));
-    ESP_ERROR_CHECK(register_entry("breathing_light", breath_handle, NULL, &g_led_strip));
+    ESP_ERROR_CHECK(register_entry("dimmable_light", dimmable_handle, NULL, g_led_strips));
+    ESP_ERROR_CHECK(register_entry("marquee", marquee_handle, NULL, g_led_strips));
+    ESP_ERROR_CHECK(register_entry("breathing_light", breath_handle, NULL, g_led_strips));
 #endif /* CONFIG_NODE_USING_LED_STRIP */
     return ESP_OK;
 }

@@ -2,7 +2,7 @@
  * @Author      : kevin.z.y <kevin.cn.zhengyang@gmail.com>
  * @Date        : 2023-09-08 16:16:12
  * @LastEditors : kevin.z.y <kevin.cn.zhengyang@gmail.com>
- * @LastEditTime: 2023-10-02 20:51:58
+ * @LastEditTime: 2023-10-11 20:15:21
  * @FilePath    : /shellhomenode/main/main.c
  * @Description : dummy node for shell home
  * Copyright (c) 2023 by Zheng, Yang, All Rights Reserved.
@@ -73,12 +73,12 @@ void app_main(void)
 
 #ifdef CONFIG_NODE_USING_RELAY
     /* Register Simple Switch */
-    // ESP_ERROR_CHECK(register_simple_switch());
+    ESP_ERROR_CHECK(register_simple_switch());
 #endif /* CONFIG_NODE_USING_RELAY */
 
 #ifdef CONFIG_NODE_USING_LED_STRIP
     /* Register LED Strip */
-    // ESP_ERROR_CHECK(register_led_strip());
+    ESP_ERROR_CHECK(register_led_strip());
 #endif /* CONFIG_NODE_USING_LED_STRIP */
 
 #ifdef CONFIG_NODE_AMBIENT_LIGHT

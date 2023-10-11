@@ -6,11 +6,11 @@ dependencies:
       type: service
     version: 3.0.1
   espressif/cmake_utilities:
-    component_hash: 9941c11223bbe015b5fe4b85ba6666b8ffde62008ec3512af91d90c482eb71d8
+    component_hash: c3f351bed6fdb3d91bee6076740cb13d22e2c7bfcdd78969a65b46943885bbd4
     source:
       service_url: https://api.components.espressif.com/
       type: service
-    version: 0.5.1
+    version: 0.5.2
   espressif/led_strip:
     component_hash: c240f82567a37357bef313f76b0df93cb2da025835e525006096ea7e0fd61b4f
     source:
@@ -35,5 +35,5 @@ dependencies:
       type: idf
     version: 5.1.1
 manifest_hash: b7da308bf83fa195fd51ca84f87acc614ad81fb8e4fbba137f518377cf9bf3ad
-target: esp32
+target: esp32c3
 version: 1.0.0

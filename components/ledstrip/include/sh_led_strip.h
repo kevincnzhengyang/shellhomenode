@@ -26,9 +26,12 @@ typedef enum {
     LS_ENTRY_OK,
     LS_ENTRY_INVALID_PARAM,
     LS_ENTRY_MISSING_ON,
+    LS_ENTRY_MISSING_INDEX,
     LS_ENTRY_MISSING_R,
     LS_ENTRY_MISSING_G,
     LS_ENTRY_MISSING_B,
+    LS_ENTRY_INVALID_INDEX,
+    LS_ENTRY_NOT_CONFIGED,
     LS_ENTRY_INVALID_R,
     LS_ENTRY_INVALID_G,
     LS_ENTRY_INVALID_B,
@@ -41,7 +44,10 @@ typedef struct {
     led_strip_handle_t     led_strip;       // LED Strip
     esp_timer_handle_t  timer_handle;       // timer handler
     bool                     running;       // marquee or breath running flag
+    bool                    configed;       // configured or not
     uint8_t                    count;       // count for marquee or breath
+    uint32_t                 led_num;       // LED number in the strip
+    char                       *name;       // name of LED strip
 } LED_Strip_Stru;
 
 /***

@@ -209,17 +209,61 @@ menu "Devices Configuration"
             config LED_STRIP_RESOLUTION_HZ
                 int "Resolution for LED strip"
                 default 10000000
-            config LED_STRIP_GPIO_NUM
-                int "GPIO number for LED strip"
-                range 0 39
-                default 10 if IDF_TARGET_ESP32C3
-                default 23 if IDF_TARGET_ESP32
-            config LED_NUM
-                int "number of LEDs"
-                default 64
             config CHASE_SPEED_MS
                 int "chase speed in ms"
                 default 10
+            menuconfig USING_STRIP_1
+                bool "LED Strip 1"
+                default n
+                if USING_STRIP_1
+                    config STRIP1_GPIO_NUM
+                        int "GPIO number for LED Stip 1"
+                        range 0 39
+                        default 10 if IDF_TARGET_ESP32C3
+                        default 23 if IDF_TARGET_ESP32
+                    config STRIP1_LED_NUM
+                        int "number of LEDs"
+                        default 49
+                endif
+            menuconfig USING_STRIP_2
+                bool "LED Strip 2"
+                default n
+                if USING_STRIP_2
+                    config STRIP2_GPIO_NUM
+                        int "GPIO number for LED Stip 2"
+                        range 0 39
+                        default 9 if IDF_TARGET_ESP32C3
+                        default 21 if IDF_TARGET_ESP32
+                    config STRIP2_LED_NUM
+                        int "number of LEDs"
+                        default 29
+                endif
+            menuconfig USING_STRIP_3
+                bool "LED Strip 3"
+                default n
+                if USING_STRIP_3
+                    config STRIP3_GPIO_NUM
+                        int "GPIO number for LED Stip 3"
+                        range 0 39
+                        default 12 if IDF_TARGET_ESP32C3
+                        default 24 if IDF_TARGET_ESP32
+                    config LED_NUM
+                        int "number of LEDs"
+                        default 50
+                endif
+            menuconfig USING_STRIP_4
+                bool "LED Strip 4"
+                default n
+                if USING_STRIP_4
+                    config STRIP4_GPIO_NUM
+                        int "GPIO number for LED Stip 4"
+                        range 0 39
+                        default 13 if IDF_TARGET_ESP32C3
+                        default 25 if IDF_TARGET_ESP32
+                    config STRIP2_LED_NUM
+                        int "number of LEDs"
+                        default 50
+                endif
         endif
 
     menuconfig NODE_USING_RELAY
